@@ -26,6 +26,11 @@ jobs:
       - name: Build
         run: dotnet build --configuration ${{env.BUILD_CONFIG}}
         working-directory: ${{env.PROJ_DIR}}
+      - name: Debug Print Variables
+        run: |
+          echo "OutputPath: $(OutputPath)"
+          echo "AssemblyName: $(AssemblyName)"
+        working-directory: ${{env.PROJ_DIR}}
       - name: Create Package Directory
         run: mkdir nupkgs
       - name: Pack
