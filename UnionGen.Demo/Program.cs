@@ -1,5 +1,5 @@
 ﻿using UnionGen.Types;
-using UnionTest;
+using UnionDemo;
 
 var demo = new DemoObj(4);
 Console.WriteLine(demo.IsInt);

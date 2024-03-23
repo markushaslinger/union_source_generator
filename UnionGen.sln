@@ -5,7 +5,7 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnionGen", "UnionGen\UnionGen.csproj", "{0A5BF555-E471-4A44-97F3-53AB029E4E2F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnionTest", "UnionTest\UnionTest.csproj", "{67B9DC18-F827-44C3-A428-03609FB84E3B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnionGen.Demo", "UnionGen.Demo\UnionGen.Demo.csproj", "{67B9DC18-F827-44C3-A428-03609FB84E3B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnionGen.Test", "UnionGen.Test\UnionGen.Test.csproj", "{B75DD262-C37D-4125-B46A-D13379EE5865}"
 EndProject

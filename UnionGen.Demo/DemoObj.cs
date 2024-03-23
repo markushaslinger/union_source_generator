@@ -3,7 +3,7 @@ using MyNamespace;
 using UnionGen;
 using UnionGen.Types;
 
-namespace UnionTest
+namespace UnionDemo
 {
     [Union<int, double, long[], List<Foo>, Dictionary<string, bool>>]
     public readonly partial struct DemoObj;
