@@ -33,6 +33,8 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>union;source generator</PackageTags>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <RepositoryUrl>https://github.com/markushaslinger/union_source_generator</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
 </Project>
