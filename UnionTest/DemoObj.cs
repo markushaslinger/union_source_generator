@@ -4,7 +4,7 @@ using UnionGen;
 
 namespace UnionTest
 {
-    [Union<int, double, long, Foo, bool>]
+    [Union<int, double, long[], Foo[], Dictionary<string, bool>>]
     public readonly partial struct DemoObj;
 
 }

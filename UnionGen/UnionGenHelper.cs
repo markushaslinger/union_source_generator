@@ -272,7 +272,7 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
             accessors.AppendLine($"public {type.FullName} As{type.TitleCaseName}() =>");
             accessors.AppendLine($"Is{type.TitleCaseName}", 1);
             accessors.AppendLine($"? {ValueFieldNamePrefix}{i}", 2);
-            accessors.AppendLine($": throw new InvalidOperationException($\"Is not of type {type.Name} but type {{{TypeLookupFunc}()}}\");", 2);
+            accessors.AppendLine($": throw new InvalidOperationException($\"Is not of type {type.FullName} but type {{{TypeLookupFunc}()}}\");", 2);
 
             if (i < union.TypeParameters.Count - 1)
             {

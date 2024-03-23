@@ -7,17 +7,10 @@ namespace UnionGen
     internal sealed record TypeParameter(string Name, string FullName, bool IsReferenceType)
     {
         private string? _titleCaseName;
-        public string TitleCaseName => _titleCaseName ??= EnsureTitleCase(Name);
+        public string TitleCaseName => _titleCaseName ??= Name.EnsureTitleCase();
         public string CallOperator => IsReferenceType
             ? "?."
             : ".";
-        
-        private static string EnsureTitleCase(string type)
-        {
-            Span<char> t = type.ToCharArray();
-            t[0] = char.ToUpper(t[0]);
-            return t.ToString();
-        }
     }
 
     internal sealed class ValueEqualityArray<T>(IEnumerable<T> items) : IReadOnlyList<T>, IEquatable<ValueEqualityArray<T>>
