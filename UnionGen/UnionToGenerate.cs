@@ -1,59 +1,81 @@
 ﻿using System.Collections;
 
-namespace UnionGen;
-
-internal record struct UnionToGenerate(string Name, string Namespace, ValueEqualityArray<string> TypeParameters);
-
-internal sealed class ValueEqualityArray<T>(IEnumerable<T> items) : IReadOnlyList<T>, IEquatable<ValueEqualityArray<T>>
-    where T : IEquatable<T>
+namespace UnionGen
 {
-    private readonly T[] _items = items as T[] ?? items.ToArray();
+    internal sealed record UnionToGenerate(string Name, string Namespace, ValueEqualityArray<TypeParameter> TypeParameters);
 
-    public T this[int index] => _items[index];
-
-    public int Count => _items.Length;
-
-    public bool Equals(ValueEqualityArray<T>? other)
+    internal sealed record TypeParameter(string Name, string FullName, bool IsReferenceType)
     {
-        if (other is null || Count != other.Count)
+        private string? _titleCaseName;
+        public string TitleCaseName => _titleCaseName ??= EnsureTitleCase(Name);
+        public string CallOperator => IsReferenceType
+            ? "?."
+            : ".";
+        
+        private static string EnsureTitleCase(string type)
         {
-            return false;
+            Span<char> t = type.ToCharArray();
+            t[0] = char.ToUpper(t[0]);
+            return t.ToString();
         }
+    }
 
-        for (var i = 0; i < Count; i++)
+    internal sealed class ValueEqualityArray<T>(IEnumerable<T> items) : IReadOnlyList<T>, IEquatable<ValueEqualityArray<T>>
+        where T : IEquatable<T>
+    {
+        private readonly T[] _items = items as T[] ?? items.ToArray();
+
+        public T this[int index] => _items[index];
+
+        public int Count => _items.Length;
+
+        public bool Equals(ValueEqualityArray<T>? other)
         {
-            if (!this[i].Equals(other[i]))
+            if (other is null || Count != other.Count)
             {
                 return false;
             }
-        }
 
-        return true;
-    }
-
-    public override bool Equals(object? obj) => Equals(obj as ValueEqualityArray<T>);
-
-    public override int GetHashCode()
-    {
-        unchecked // Overflow is fine, just wrap
-        {
-            var hash = 19;
-            foreach (var item in _items)
+            for (var i = 0; i < Count; i++)
             {
-                hash = hash * 31 + item.GetHashCode();
+                if (!this[i].Equals(other[i]))
+                {
+                    return false;
+                }
             }
 
-            return hash;
+            return true;
         }
-    }
 
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        public override bool Equals(object? obj) => Equals(obj as ValueEqualityArray<T>);
 
-    public IEnumerator<T> GetEnumerator()
-    {
-        foreach (var item in _items)
+        public override int GetHashCode()
         {
-            yield return item;
+            unchecked // Overflow is fine, just wrap
+            {
+                var hash = 19;
+                foreach (var item in _items)
+                {
+                    hash = hash * 31 + item.GetHashCode();
+                }
+
+                return hash;
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            foreach (var item in _items)
+            {
+                yield return item;
+            }
         }
     }
+}
+
+namespace System.Runtime.CompilerServices
+{
+    public class IsExternalInit { }
 }

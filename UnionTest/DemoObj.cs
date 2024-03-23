@@ -1,9 +1,15 @@
 ﻿
+using MyNamespace;
 using UnionGen;
 
-namespace UnionTest;
+namespace UnionTest
+{
+    [Union<int, double, long, Foo, bool>]
+    public readonly partial struct DemoObj;
 
-[Union<int, double, float, Foo, bool>]
-public readonly partial struct DemoObj;
+}
 
-public class Foo;
+namespace MyNamespace
+{
+    public class Foo;
+}

@@ -82,15 +82,14 @@ public sealed class UnionSourceGen : IIncrementalGenerator
 
     private static void Execute(UnionToGenerate? sourceData, SourceProductionContext ctx)
     {
-        if (!sourceData.HasValue)
+        if (sourceData is null)
         {
             return;
         }
-
-        var value = sourceData.Value;
-        var helper = new UnionGenHelper(value);
+        
+        var helper = new UnionGenHelper(sourceData);
         var result = helper.GeneratePartialStruct();
-        ctx.AddSource($"{genNamespace}.{value.Name}.g.cs", SourceText.From(result, Encoding.UTF8));
+        ctx.AddSource($"{genNamespace}.{sourceData.Name}.g.cs", SourceText.From(result, Encoding.UTF8));
     }
 
     private static UnionToGenerate? GetUnionToGenerate(SemanticModel semanticModel, SyntaxNode syntaxNode)
@@ -125,10 +124,24 @@ public sealed class UnionSourceGen : IIncrementalGenerator
             return null;
         }
 
-        var typeNames = new List<string>(genericName.TypeArgumentList.Arguments.Count);
+        var typeNames = new List<TypeParameter>(genericName.TypeArgumentList.Arguments.Count);
         foreach (var argument in genericName.TypeArgumentList.Arguments)
         {
-            typeNames.Add(argument.ToString());
+            var typeSymbol = semanticModel.GetTypeInfo(argument).Type;
+            if (typeSymbol is null)
+            {
+                return null;
+            }
+            
+            var name = typeSymbol.Name;
+            var fullName = typeSymbol.ToString();
+            var isReferenceType = typeSymbol.IsReferenceType;
+            var isBuiltInType = typeSymbol.SpecialType != SpecialType.None;
+            if (isBuiltInType)
+            {
+                name = fullName;
+            }
+            typeNames.Add(new TypeParameter(name, fullName, isReferenceType));
         }
 
         var annotatedType = structSyntax.Identifier.Text;
