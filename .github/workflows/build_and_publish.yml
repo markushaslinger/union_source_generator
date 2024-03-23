@@ -26,7 +26,7 @@ jobs:
       - name: Create Package Directory
         run: mkdir nupkgs
       - name: Pack
-        run: dotnet pack -c ${{env.BUILD_CONFIG}} --include-symbols --output ${{env.NUGET_DIR}}
+        run: dotnet pack -c ${{env.BUILD_CONFIG}} --output ${{env.NUGET_DIR}}
         working-directory: ${{env.PROJ_DIR}}
       - name: Publish
         working-directory: ${{env.NUGET_DIR}}
