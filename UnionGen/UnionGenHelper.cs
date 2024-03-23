@@ -148,7 +148,7 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
             var type = union.TypeParameters[i];
             var postfix = type.IsReferenceType
                 ? " ?? \"null\""
-                : string.Empty;
+                : "!";
             cases.AppendLine($"{i} => {ValueFieldNamePrefix}{i}{type.CallOperator}ToString(){postfix},");
         }
         cases.AppendLine($"_ => throw new InvalidOperationException($\"Unknown type index {{{IndexFieldName}}}\")");
