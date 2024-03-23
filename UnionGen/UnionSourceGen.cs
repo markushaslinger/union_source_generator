@@ -91,7 +91,7 @@ public sealed class UnionSourceGen : IIncrementalGenerator
 
         var helper = new UnionGenHelper(sourceData);
         var result = helper.GeneratePartialStruct();
-        ctx.AddSource($"{genNamespace}.{sourceData.Name}.g.cs", SourceText.From(result, Encoding.UTF8));
+        ctx.AddSource($"{sourceData.Namespace}.{sourceData.Name}.g.cs", SourceText.From(result, Encoding.UTF8));
     }
 
     private static UnionToGenerate? GetUnionToGenerate(SemanticModel semanticModel, SyntaxNode syntaxNode)
