@@ -1,11 +1,19 @@
-﻿namespace UnionTest;
+﻿using UnionGen.Types;
+using UnionTest;
 
-public class Program
-{
-    public static void Main(string[] args)
-    {
-        var demo = new DemoObj(4);
-        Console.WriteLine(demo);
-        Console.WriteLine(demo.GetHashCode());
-    }
-}
+var demo = new DemoObj(4);
+Console.WriteLine(demo.IsInt);
+Console.WriteLine(demo.AsInt());
+
+var simple = CreateSimple();
+simple.Switch(
+              r =>  Console.WriteLine($"Found: {r}"),
+              _ => Console.WriteLine("not found"));
+
+var result = simple.Match(r => r.Value * 2,
+                          _ => -1);
+Console.WriteLine(result);
+
+return;
+
+SimpleObj CreateSimple() => new NotFound();
