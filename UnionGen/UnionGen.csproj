@@ -16,6 +16,23 @@
   <ItemGroup>
     <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true"
           PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="../readme.md" Pack="true" Link="readme.md" PackagePath="" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <Title>Union Source Generator</Title>
+    <Description>A source generator for creating C# union types via a generic marker attribute.</Description>
+    <PackageId>UnionGen</PackageId>
+    <PackageReadmeFile>readme.md</PackageReadmeFile>
+    <PackageVersion>1.0.0</PackageVersion>
+    <Authors>M. Haslinger</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>union;source generator</PackageTags>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
 
 </Project>
