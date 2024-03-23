@@ -10,7 +10,7 @@ The main component is one *generic attribute*, `UnionAttribute`, which is used t
 public readonly partial struct SimpleObj;
 ```
 
-This will result in a generated `DemoObj` type that can hold any of the specified types, *but only one at a time*.
+This will result in a generated `SimpleObj` type that can hold any of the specified types, *but only one at a time*.
 It also provides compile time checked _exhaustive_ `Switch` and `Match` methods to handle the different types.
 Implicit conversions operators are generated as well as equality members.
 
