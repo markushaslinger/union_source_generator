@@ -23,16 +23,10 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
-      - name: Build
-        run: dotnet build --configuration ${{env.BUILD_CONFIG}}
-        working-directory: ${{env.PROJ_DIR}}
-      - name: Debug GH Actions Environment
-        run: dotnet msbuild PrintProps.proj /t:PrintProps
-        working-directory: ${{env.PROJ_DIR}}
       - name: Create Package Directory
         run: mkdir nupkgs
       - name: Pack
-        run: dotnet pack --no-build --include-symbols --output ${{env.NUGET_DIR}}
+        run: dotnet pack -c ${{env.BUILD_CONFIG}} --include-symbols --output ${{env.NUGET_DIR}}
         working-directory: ${{env.PROJ_DIR}}
       - name: Publish
         working-directory: ${{env.NUGET_DIR}}
