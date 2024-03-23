@@ -167,9 +167,11 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
     private string GenerateGetHashCode()
     {
         var cases = new IndentedStringBuilder(5);
+        var anyRefType = false;
         for (var i = 0; i < union.TypeParameters.Count; i++)
         {
             var type = union.TypeParameters[i];
+            anyRefType |= type.IsReferenceType;
             cases.AppendLine($"{i} => {ValueFieldNamePrefix}{i}{type.CallOperator}GetHashCode(),");
         }
         cases.AppendLine("_ => 0");
@@ -182,7 +184,7 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
         hashCodeMethod.AppendLine($"var hash = {IndexFieldName} switch", 2);
         hashCodeMethod.AppendLine("{", 2);
         hashCodeMethod.Append(cases);
-        hashCodeMethod.AppendLine("} ?? 0;", 2);
+        hashCodeMethod.AppendLine($"}}{(anyRefType ? "?? 0" : string.Empty)};", 2);
         hashCodeMethod.AppendLine($"return (hash * 397) ^ {IndexFieldName};", 2);
         hashCodeMethod.AppendLine("}", 1);
         hashCodeMethod.AppendLine("}");
@@ -217,7 +219,7 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
             constructors.AppendLine(constructor.ToString());
         }
         
-        constructors.AppendLine($"public {union.Name}(): this(-1) {{}}");
+        constructors.AppendLine($"public {union.Name}(): this(index: byte.MaxValue) {{}}");
 
         return constructors.ToString();
     }

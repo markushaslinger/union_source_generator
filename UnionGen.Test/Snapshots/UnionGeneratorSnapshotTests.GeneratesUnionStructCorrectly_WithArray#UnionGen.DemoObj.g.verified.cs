@@ -9,7 +9,7 @@ namespace Test1
 		private readonly int _value0;
 		private readonly long[] _value1;
 
-		private DemoObj(byte index, int value0 = default!, long[] value1 = default!)
+		private DemoObj(byte index, int value0 = default, long[] value1 = default!)
 		{
 			_index = index;
 			_value0 = value0;
@@ -21,15 +21,15 @@ namespace Test1
 		public DemoObj(): this(-1) {}
 
 		public bool IsInt => _index == 0;
-		public bool IsLong[] => _index == 1;
+		public bool IsLongArray => _index == 1;
 
 		public int AsInt() =>
 			IsInt
 				? _value0
 				: throw new InvalidOperationException($"Is not of type int but type {GetActualTypeName()}");
 		
-		public long[] AsLong[]() =>
-			IsLong[]
+		public long[] AsLongArray() =>
+			IsLongArray
 				? _value1
 				: throw new InvalidOperationException($"Is not of type long[] but type {GetActualTypeName()}");
 
@@ -38,20 +38,20 @@ namespace Test1
 		public static bool operator ==(DemoObj left, DemoObj right) => left.Equals(right);
 		public static bool operator !=(DemoObj left, DemoObj right) => !left.Equals(right);
 
-		public TResult Match<TResult>(Func<int, TResult> withInt, Func<long[], TResult> withLong[]) => 		
+		public TResult Match<TResult>(Func<int, TResult> withInt, Func<long[], TResult> withLongArray) => 		
 			_index switch
 			{
 				0 => withInt(_value0),
-				1 => withLong[](_value1),
+				1 => withLongArray(_value1),
 				_ => throw new InvalidOperationException($"Unknown type index {_index}")
 			};
 
-		public void Switch(Action<int> forInt, Action<long[]> forLong[])		
+		public void Switch(Action<int> forInt, Action<long[]> forLongArray)		
 		{
 			switch (_index)
 			{
 				case 0: forInt(_value0); break;
-				case 1: forLong[](_value1); break;
+				case 1: forLongArray(_value1); break;
 				default: throw new InvalidOperationException($"Unknown type index {_index}");
 			}
 		}
@@ -59,7 +59,7 @@ namespace Test1
 		public override string ToString() => 		
 			_index switch
 			{
-				0 => _value0?.ToString() ?? "null",
+				0 => _value0.ToString(),
 				1 => _value1?.ToString() ?? "null",
 				_ => throw new InvalidOperationException($"Unknown type index {_index}")
 			};
@@ -87,7 +87,7 @@ namespace Test1
 			{
 				var hash = _index switch
 				{
-					0 => _value0?.GetHashCode(),
+					0 => _value0.GetHashCode(),
 					1 => _value1?.GetHashCode(),
 					_ => 0
 				} ?? 0;
