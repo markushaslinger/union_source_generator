@@ -1,0 +1,7 @@
+<!-- PrintProps.proj -->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="PrintProps">
+    <Message Text="OutputPath: $(OutputPath)" Importance="high" />
+    <Message Text="AssemblyName: $(AssemblyName)" Importance="high" />
+  </Target>
+</Project>
