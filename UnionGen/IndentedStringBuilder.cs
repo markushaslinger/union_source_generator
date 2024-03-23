@@ -2,7 +2,7 @@
 
 namespace UnionGen;
 
-public sealed class IndentedStringBuilder
+internal sealed class IndentedStringBuilder
 {
     public const string NewLine = "\r\n";
     private readonly int _allLinesIndent;
