@@ -23,15 +23,90 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
                      {{typeFields}}
                      {{GenerateConstructors()}}
                      {{typeProperties}}
-                     
                      {{GenerateAccessors()}}
-                     
+                     {{GenerateImplicitOperators()}}
+                     {{GenerateMatch()}}
+                     {{GenerateSwitch()}}
                      {{GenerateGetActualTypeName()}}
                          }
                      }
                      """;
 
         return code;
+    }
+
+    private string GenerateSwitch()
+    {
+        var parameters = new StringBuilder();
+        var cases = new IndentedStringBuilder(4);
+        for (var i = 0; i < union.TypeParameters.Count; i++)
+        {
+            var rawType = union.TypeParameters[i];
+            var type = EnsureTitleCase(rawType);
+            var actionName = $"for{type}";
+            parameters.Append($"Action<{rawType}> {actionName}");
+            if (i < union.TypeParameters.Count - 1)
+            {
+                parameters.Append(", ");
+            }
+            cases.AppendLine($"case {i}: {actionName}({ValueFieldNamePrefix}{i}); break;");
+        }
+        cases.AppendLine($"default: throw new InvalidOperationException($\"Unknown type index {{{IndexFieldName}}}\");");
+        
+        var switchMethod = new IndentedStringBuilder(2, "public void Switch(");
+        switchMethod.Append(parameters.ToString());
+        switchMethod.Append(")");
+        switchMethod.AppendLine(string.Empty);
+        switchMethod.AppendLine("{");
+        switchMethod.AppendLine($"switch ({IndexFieldName})", 1);
+        switchMethod.AppendLine("{", 1);
+        switchMethod.Append(cases.ToString());
+        switchMethod.AppendLine("}", 1);
+        switchMethod.AppendLine("}");
+        
+        return switchMethod.ToString();
+    }
+    
+    private string GenerateMatch()
+    {
+        var parameters = new StringBuilder();
+        var cases = new IndentedStringBuilder(4);
+        for (var i = 0; i < union.TypeParameters.Count; i++)
+        {
+            var rawType = union.TypeParameters[i];
+            var type = EnsureTitleCase(rawType);
+            var funcName = $"with{type}";
+            parameters.Append($"Func<{rawType}, TResult> {funcName}");
+            if (i < union.TypeParameters.Count - 1)
+            {
+                parameters.Append(", ");
+            }
+            cases.AppendLine($"{i} => {funcName}({ValueFieldNamePrefix}{i}),");
+        }
+        cases.AppendLine($"_ => throw new InvalidOperationException($\"Unknown type index {{{IndexFieldName}}}\")");
+
+        var matchMethod = new IndentedStringBuilder(2, $"public TResult Match<TResult>({parameters})");
+        matchMethod.Append(" => ");
+        matchMethod.AppendLine(string.Empty);
+        matchMethod.AppendLine($"{IndexFieldName} switch", 1);
+        matchMethod.AppendLine("{", 1);
+        matchMethod.Append(cases);
+        matchMethod.AppendLine("};", 1);
+        //matchMethod.AppendLine("}");
+
+        return matchMethod.ToString();
+    }
+    
+    private string GenerateImplicitOperators()
+    {
+        var operators = new IndentedStringBuilder(2);
+
+        foreach (var type in union.TypeParameters)
+        {
+            operators.AppendLine($"public static implicit operator {union.Name}({type} {ValueParameterName}) => new {union.Name}({ValueParameterName});");
+        }
+
+        return operators.ToString();
     }
 
     private string GenerateConstructors()
@@ -53,7 +128,7 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
     
     private string GeneratePrivateConstructor()
     {
-        var parameters = new StringBuilder($"int {IndexParameterName}, ");
+        var parameters = new StringBuilder($"byte {IndexParameterName}, ");
         var assignments = new IndentedStringBuilder(3, $"{IndexFieldName} = {IndexParameterName};{IndentedStringBuilder.NewLine}");
         for (var i = 0; i < union.TypeParameters.Count; i++)
         {
@@ -115,7 +190,7 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
     private (string TypeFields, string TypeProperties) GenerateFieldsAndProperties()
     {
         var typeFields = new IndentedStringBuilder(2,
-                                                   $"private readonly int {IndexFieldName};{IndentedStringBuilder.NewLine}");
+                                                   $"private readonly byte {IndexFieldName};{IndentedStringBuilder.NewLine}");
         var typeProperties = new IndentedStringBuilder(2);
         for (var i = 0; i < union.TypeParameters.Count; i++)
         {

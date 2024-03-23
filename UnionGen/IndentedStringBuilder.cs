@@ -20,6 +20,16 @@ public sealed class IndentedStringBuilder
     {
         _builder.Append(value);
     }
+    
+    public void Append(StringBuilder otherBuilder)
+    {
+        _builder.Append(otherBuilder);
+    }
+    
+    public void Append(IndentedStringBuilder otherBuilder)
+    {
+        _builder.Append(otherBuilder._builder);
+    }
 
     public void AppendLine(string value, int extraIndent = 0)
     {
@@ -41,6 +51,7 @@ public sealed class IndentedStringBuilder
                    3 => $"{Indent}{Indent}{Indent}",
                    4 => $"{Indent}{Indent}{Indent}{Indent}",
                    5 => $"{Indent}{Indent}{Indent}{Indent}{Indent}",
+                   6 => $"{Indent}{Indent}{Indent}{Indent}{Indent}{Indent}",
                    _ => string.Concat(Enumerable.Repeat(Indent, count))
                };
     }
