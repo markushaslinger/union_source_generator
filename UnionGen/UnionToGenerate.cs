@@ -2,7 +2,25 @@
 
 namespace UnionGen
 {
-    internal sealed record UnionToGenerate(string Name, string Namespace, ValueEqualityArray<TypeParameter> TypeParameters);
+    internal sealed record UnionToGenerate(
+        string Name,
+        string Namespace,
+        ValueEqualityArray<TypeParameter> TypeParameters)
+    {
+        public bool AnyReferenceType()
+        {
+            for (var index = 0; index < TypeParameters.Count; index++)
+            {
+                var type = TypeParameters[index];
+                if (type.IsReferenceType)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
 
     internal sealed record TypeParameter(string Name, string FullName, bool IsReferenceType)
     {
