@@ -28,7 +28,7 @@ public sealed class UnionGeneratorSnapshotTests
                      using UnionGen;
 
                      [ProtoMember(1)]
-                     [Union<int,long[]>]
+                     [Union<int,long[]>(UnionAlignment.Aligned8)]
                      public partial struct DemoObj;
                      """;
 
