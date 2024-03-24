@@ -79,7 +79,7 @@ public sealed class UnionSourceGen : IIncrementalGenerator
         {
             typeParams.Append($", T{i}");
 
-            attributes.AppendLine("[System.AttributeUsage(System.AttributeTargets.Struct)]");
+            attributes.AppendLine("[System.AttributeUsage(System.AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]");
             attributes.AppendLine($"public sealed class {AttributeName}<{typeParams}> : System.Attribute");
             attributes.AppendLine("{");
             attributes.AppendLine($"public {AttributeName}({genNamespace}.{AlignmentEnumName} alignment = {genNamespace}.{DefaultAlignment})", 1);
