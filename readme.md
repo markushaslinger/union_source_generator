@@ -27,7 +27,7 @@ SimpleObj CreateSimple() => new NotFound();
 
 > While the generator itself has to be a `netstandard2.0` project, the generated code assumes C#12 / .NET 8 at this point.
 
-> This project is _heavily_ influenced by the great [`OneOf`](https://github.com/mcintyre321/OneOf) library. All credit for the original concept to its authors!
+> This project is _heavily_ influenced by the great [OneOf](https://github.com/mcintyre321/OneOf) library. All credit for the original concept to its authors!
 
 ## Opinionated Naming Scheme 
 
