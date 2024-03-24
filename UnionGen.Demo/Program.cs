@@ -1,9 +1,18 @@
-﻿using UnionGen.Types;
-using UnionDemo;
+﻿using UnionDemo;
+using UnionGen.Types;
 
 var demo = new DemoObj(4);
 Console.WriteLine(demo.IsInt);
 Console.WriteLine(demo.AsInt());
+
+var demo2 = new DemoObj([1L, 2L, 3L]);
+Console.WriteLine(demo2.IsLongArray);
+demo2.Switch(forInt: _ => {},
+             forDouble: _ => {},
+             forLongArray: a => Console.WriteLine($"{a.GetType()} {a.Length}"),
+             forListOfFoo: _ => {},
+             forDictionaryOfStringAndBoolean: _ => {}
+             );
 
 var simple = new SimpleObj(new Result<int>(12));
 var found = simple.IsNotFound;
@@ -17,3 +26,5 @@ var res = simple.Match(r => r.Value * 2,
 return;
 
 SimpleObj CreateSimple() => new NotFound();
+
+
