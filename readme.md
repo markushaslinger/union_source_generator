@@ -44,6 +44,23 @@ For `Switch` they will get names like `forString` (or `forNone`) and for `Match`
 
 That can work great in many scenarios but will probably lead to bad naming in some cases - that's the trade-off I'm willing to accept.
 
+## Union Object Size
+
+We try to be smart and use as little memory as possible for the union object.
+
+- They are `readonly struct`s
+- Only those fields actually needed are generated
+  - e.g. only a single reference field which is used for all reference types
+  - if there are not reference types, no reference field is generated
+  - if there are no value types, no value field is generated
+- The fields of the value types are stored at the same offset
+  - That is safe, because only one of those will ever be set and the values are `readonly`
+- A single `byte` is used for storing the state so that they union object knows _what_ it is
+
+So the _minimal_ size is 3 bytes (1 for state, 1 for each of the two min. required types) and the _maximal_ size is 9 bytes (1 for state and 8 for the reference type) + the size of the largest value type.
+
+> We assume 8 bytes for reference types, so 32bit targets waste some space and larger pointer sizes are not supported at all.
+
 ## Motivation
 
 My main motivation was to finally learn more about writing source generators by creating one myself.
