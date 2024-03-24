@@ -52,7 +52,11 @@ public sealed class UnionSourceGen : IIncrementalGenerator
                                                                       SourceText.From(attributeSourceCode,
                                                                            Encoding.UTF8)));
         context.RegisterPostInitializationOutput(ctx => ctx.AddSource($"{genNamespace}.Types.g.cs",
-                                                                      SourceText.From(Types.TypesSource + IndentedStringBuilder.NewLine + Types.StateByteSource,
+                                                                      SourceText.From(Types.TypesSource 
+                                                                       + IndentedStringBuilder.NewLine 
+                                                                       + Types.StateByteSource
+                                                                       + IndentedStringBuilder.NewLine
+                                                                       + Types.PointerSizeGuardSource,
                                                                            Encoding.UTF8)));
     }
 
@@ -299,5 +303,29 @@ public sealed class UnionSourceGen : IIncrementalGenerator
                                                   }
                                               }
                                               """;
+
+        public const string PointerSizeGuardSource = """
+                                                     namespace UnionGen
+                                                     {
+                                                         internal static class PointerSizeGuard
+                                                         {
+                                                             public const int ExpectedPointerSize = 8;
+                                                     
+                                                             static PointerSizeGuard()
+                                                             {
+                                                                 if (IntPtr.Size != ExpectedPointerSize)
+                                                                 {
+                                                                     throw new
+                                                                         NotSupportedException($"Pointer size {IntPtr.Size} is not supported by union source generator - expected {ExpectedPointerSize}.");
+                                                                 }
+                                                             }
+                                                     
+                                                             public static void EnsureInitialized()
+                                                             {
+                                                                 _ = ExpectedPointerSize;
+                                                             }
+                                                         }
+                                                     }
+                                                     """;
     }
 }
