@@ -408,9 +408,12 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
     private (int StateOffset, int ValueOffset) GetOffsets()
     {
         // for simplicity, we assume 64-bit system with 8 byte pointer size, because most common these days
+        // 32-bit systems will waste 4 bytes here
+        // larger pointer sizes are not supported and <see cref="PointerSizeGuard"/> will throw an exception
         var stateOffset = union.AnyReferenceType()
             ? 8
             : 0;
+        
         // the state is stored in a single byte
         var valueOffset = stateOffset + 1;
 

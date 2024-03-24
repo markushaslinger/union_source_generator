@@ -313,10 +313,10 @@ public sealed class UnionSourceGen : IIncrementalGenerator
                                                      
                                                              static PointerSizeGuard()
                                                              {
-                                                                 if (IntPtr.Size != ExpectedPointerSize)
+                                                                 if (IntPtr.Size > ExpectedPointerSize)
                                                                  {
                                                                      throw new
-                                                                         NotSupportedException($"Pointer size {IntPtr.Size} is not supported by union source generator - expected {ExpectedPointerSize}.");
+                                                                         NotSupportedException($"Pointer size {IntPtr.Size} is not supported by union source generator - expected {ExpectedPointerSize} at most.");
                                                                  }
                                                              }
                                                      
