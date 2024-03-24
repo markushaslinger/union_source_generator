@@ -1,0 +1,79 @@
+BenchmarkDotNet v0.13.12, Windows 11 (10.0.22631.3296/23H2/2023Update/SunValley3)
+AMD Ryzen 7 5800X, 1 CPU, 16 logical and 8 physical cores
+.NET SDK 8.0.202
+  [Host]     : .NET 8.0.3 (8.0.324.11423), X64 RyuJIT AVX2
+  DefaultJob : .NET 8.0.3 (8.0.324.11423), X64 RyuJIT AVX2
+
+// aligned by 4
+| Method                     | Mean      | Error     | StdDev    | Allocated |
+|----------------------------|----------:|----------:|----------:|----------:|
+| AlignedRandomSumInt        | 19.314 ms | 0.1440 ms | 0.1347 ms |      12 B |
+| UnalignedRandomSumInt      | 19.373 ms | 0.1226 ms | 0.1024 ms |      12 B |
+| AlignedRandomSumShort      | 19.411 ms | 0.1079 ms | 0.1010 ms |      12 B |
+| UnalignedRandomSumShort    | 19.295 ms | 0.1046 ms | 0.0927 ms |      12 B |
+| AlignedRandomSumLong       | 20.282 ms | 0.1168 ms | 0.1035 ms |      12 B |
+| UnalignedRandomSumLong     | 20.286 ms | 0.1645 ms | 0.1374 ms |      12 B |
+| AlignedRandomSumFoo        | 20.718 ms | 0.2001 ms | 0.1774 ms |      12 B |
+| UnalignedRandomSumFoo      | 20.895 ms | 0.0956 ms | 0.0799 ms |      12 B |
+| AlignedRandomSumFooNoRef   | 20.432 ms | 0.1606 ms | 0.1502 ms |      12 B |
+| UnalignedRandomSumFooNoRef | 20.541 ms | 0.1151 ms | 0.1020 ms |      12 B |
+| AlignedSumInt              |  7.488 ms | 0.0206 ms | 0.0172 ms |         - |
+| UnalignedSumInt            |  7.403 ms | 0.0214 ms | 0.0179 ms |       3 B |
+| AlignedSumShort            |  7.479 ms | 0.0273 ms | 0.0256 ms |       3 B |
+| UnalignedSumShort          |  7.482 ms | 0.0407 ms | 0.0361 ms |       3 B |
+| AlignedSumLong             |  8.851 ms | 0.0314 ms | 0.0278 ms |       6 B |
+| UnalignedSumLong           |  9.346 ms | 0.0676 ms | 0.0599 ms |       6 B |
+| AlignedSumFoo              |  9.030 ms | 0.0590 ms | 0.0523 ms |       6 B |
+| UnalignedSumFoo            |  9.347 ms | 0.0477 ms | 0.0446 ms |       6 B |
+| AlignedSumFooNoRef         | 16.179 ms | 0.0375 ms | 0.0313 ms |      12 B |
+| UnalignedSumFooNoRef       |  9.087 ms | 0.0745 ms | 0.0661 ms |       6 B |
+
+
+// aligned by 8 (+ roughly 220MB)
+| Method                  | Mean      | Error     | StdDev    | Allocated |
+|----------------------------|----------:|----------:|----------:|----------:|
+| AlignedRandomSumInt        | 20.074 ms | 0.1603 ms | 0.1339 ms |      12 B |
+| UnalignedRandomSumInt      | 19.841 ms | 0.3328 ms | 0.3113 ms |      12 B |
+| AlignedRandomSumShort      | 20.353 ms | 0.3109 ms | 0.2908 ms |      12 B |
+| UnalignedRandomSumShort    | 19.800 ms | 0.2178 ms | 0.1931 ms |      12 B |
+| AlignedRandomSumLong       | 20.448 ms | 0.1590 ms | 0.1410 ms |      12 B |
+| UnalignedRandomSumLong     | 20.384 ms | 0.1797 ms | 0.1681 ms |      12 B |
+| AlignedRandomSumFoo        | 21.010 ms | 0.3220 ms | 0.3012 ms |      12 B |
+| UnalignedRandomSumFoo      | 21.183 ms | 0.3002 ms | 0.2808 ms |      12 B |
+| AlignedRandomSumFooNoRef   | 20.984 ms | 0.1437 ms | 0.1274 ms |      12 B |
+| UnalignedRandomSumFooNoRef | 20.680 ms | 0.0566 ms | 0.0442 ms |      12 B |
+| AlignedSumInt              |  9.264 ms | 0.1130 ms | 0.1002 ms |       6 B |
+| UnalignedSumInt            |  7.663 ms | 0.1140 ms | 0.1067 ms |       3 B |
+| AlignedSumShort            |  9.522 ms | 0.1165 ms | 0.1090 ms |       6 B |
+| UnalignedSumShort          |  7.735 ms | 0.1542 ms | 0.1776 ms |       3 B |
+| AlignedSumLong             |  9.631 ms | 0.1838 ms | 0.1629 ms |       6 B |
+| UnalignedSumLong           |  9.440 ms | 0.0401 ms | 0.0313 ms |       6 B |
+| AlignedSumFoo              | 11.772 ms | 0.1393 ms | 0.1303 ms |       1 B |
+| UnalignedSumFoo            |  9.398 ms | 0.1814 ms | 0.1941 ms |       6 B |
+| AlignedSumFooNoRef         | 16.431 ms | 0.1677 ms | 0.1487 ms |      12 B |
+| UnalignedSumFooNoRef       |  9.268 ms | 0.1013 ms | 0.0791 ms |       6 B |
+
+
+// aligned by 16 (+ roughly 900MB)
+| Method                     | Mean      | Error     | StdDev    | Allocated |
+|----------------------------|----------:|----------:|----------:|----------:|
+| AlignedRandomSumInt        | 20.337 ms | 0.2145 ms | 0.1791 ms |       2 B |
+| UnalignedRandomSumInt      | 19.745 ms | 0.2438 ms | 0.2161 ms |      12 B |
+| AlignedRandomSumShort      | 20.382 ms | 0.2671 ms | 0.2230 ms |      12 B |
+| UnalignedRandomSumShort    | 19.531 ms | 0.2201 ms | 0.1838 ms |      12 B |
+| AlignedRandomSumLong       | 20.561 ms | 0.1403 ms | 0.1171 ms |      25 B |
+| UnalignedRandomSumLong     | 20.621 ms | 0.1881 ms | 0.1759 ms |      12 B |
+| AlignedRandomSumFoo        | 21.301 ms | 0.1544 ms | 0.1289 ms |      12 B |
+| UnalignedRandomSumFoo      | 21.053 ms | 0.1353 ms | 0.1199 ms |      12 B |
+| AlignedRandomSumFooNoRef   | 21.474 ms | 0.3598 ms | 0.3366 ms |      12 B |
+| UnalignedRandomSumFooNoRef | 20.992 ms | 0.2460 ms | 0.2301 ms |      12 B |
+| AlignedSumInt              | 13.737 ms | 0.2016 ms | 0.1787 ms |       6 B |
+| UnalignedSumInt            |  7.681 ms | 0.0674 ms | 0.0631 ms |       3 B |
+| AlignedSumShort            | 13.917 ms | 0.1931 ms | 0.1612 ms |       6 B |
+| UnalignedSumShort          |  7.559 ms | 0.0596 ms | 0.0498 ms |       3 B |
+| AlignedSumLong             | 13.733 ms | 0.1429 ms | 0.1337 ms |       6 B |
+| UnalignedSumLong           |  9.607 ms | 0.1203 ms | 0.1125 ms |       6 B |
+| AlignedSumFoo              | 16.457 ms | 0.2369 ms | 0.2216 ms |      12 B |
+| UnalignedSumFoo            |  9.565 ms | 0.0716 ms | 0.0635 ms |       6 B |
+| AlignedSumFooNoRef         | 16.532 ms | 0.2319 ms | 0.2056 ms |      12 B |
+| UnalignedSumFooNoRef       |  9.443 ms | 0.1472 ms | 0.1377 ms |       6 B |
