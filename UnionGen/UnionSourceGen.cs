@@ -54,14 +54,19 @@ public sealed class UnionSourceGen : IIncrementalGenerator
                                                                       SourceText.From(attributeSourceCode,
                                                                            Encoding.UTF8)));
         context.RegisterPostInitializationOutput(ctx => ctx.AddSource($"{genNamespace}.Types.g.cs",
-                                                                      SourceText.From(Types.TypesSource 
-                                                                       + IndentedStringBuilder.NewLine 
-                                                                       + Types.StateByteSource
-                                                                       + IndentedStringBuilder.NewLine
-                                                                       + Types.PointerSizeGuardSource
-                                                                       + IndentedStringBuilder.NewLine
-                                                                       + Types.AlignmentEnumSource,
+                                                                      SourceText.From(CreateTypesSource(),
                                                                            Encoding.UTF8)));
+    }
+
+    private static string CreateTypesSource()
+    {
+        var types = new StringBuilder();
+        types.AppendLine(Types.TypesSource);
+        types.AppendLine(Types.StateByteSource);
+        types.AppendLine(Types.PointerSizeGuardSource);
+        types.AppendLine(Types.AlignmentEnumSource);
+        
+        return types.ToString();
     }
 
     private static (string, string[]) CreateAttributeCode(string ns)
