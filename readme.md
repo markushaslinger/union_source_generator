@@ -3,14 +3,14 @@
 Union Source Generator is a C# source generator that generates a union type for a set of types. The generated union type can hold any _one_ of the specified types.
 Consuming the type can be done by _exhaustive_ pattern matching.
 
-The main component is one *generic attribute*, `UnionAttribute`, which is used to specify the types that the union can hold, on a `struct`:
+The main component is one **generic attribute**, `UnionAttribute`, which is used to specify the types that the union can hold, on a `struct`:
 
 ```csharp
 [Union<Result<int>, NotFound>]
 public readonly partial struct SimpleObj;
 ```
 
-This will result in a generated `SimpleObj` type that can hold any of the specified types, *but only one at a time*.
+This will result in a generated `SimpleObj` type that can hold any of the specified types, **but only one at a time**.
 It also provides compile time checked _exhaustive_ `Switch` and `Match` methods to handle the different types.
 Implicit conversions operators are generated as well as equality members.
 
@@ -31,7 +31,7 @@ SimpleObj CreateSimple() => new NotFound();
 
 ## Opinionated Naming Scheme 
 
-This library is *opinionated* as it will try to assign '_readable_' names to the properties based on the specified types:
+This library is **opinionated** as it will try to assign '_readable_' names to the properties based on the specified types:
 
 ```csharp
 SimpleObj simple = new SimpleObj(new Result<int>(12));
@@ -53,7 +53,7 @@ We try to be smart and use as little memory as possible for the union object.
 - They are `readonly struct`s
 - Only those fields actually needed are generated
   - e.g. only a single reference field which is used for all reference types
-  - if there are not reference types, no reference field is generated
+  - if there are no reference types, no reference field is generated
   - if there are no value types, no value field is generated
 - The fields of the value types are stored at the same offset
   - That is safe, because only one of those will ever be set and the values are `readonly`
@@ -62,7 +62,7 @@ We try to be smart and use as little memory as possible for the union object.
 So the _minimal_ size is 3 bytes (1 for state, 1 for each of the two min. required types) and the _maximal_ size is 9 bytes (1 for state and 8 for the reference type) + the size of the largest value type.
 Plus padding for alignment (see below).
 
-> We assume 8 bytes for reference types, so 32bit targets waste some space and larger pointer sizes *explicit* alignment configuration is required!
+> We assume 8 bytes for reference types, so 32bit targets waste some space and, for larger pointer sizes **explicit** alignment configuration is required!
 
 ### Alignment
 
@@ -71,7 +71,7 @@ Usually, especially since we use `readonly` structs, it is better to sacrifice a
 
 > As far as I know it is not possible to get the size of a type at compile time, so we cannot automatically make the optimal decision here.
 
-Alignment can be configured for each union type individually by passing one of the `UnionAlignment` `enum` values to the attributes constructor like so:
+Alignment can be configured for each union type _individually_ by passing one of the `UnionAlignment` `enum` values to the attributes constructor like so:
 
 ```csharp
 [Union<Result<int>, NotFound>(UnionAlignment.Aligned8)]
@@ -84,7 +84,7 @@ At this point there are four options:
   - A reference type still gets 8 bytes at the beginning of the struct
   - Value type fields are placed directly after the state field - this will result in those being misaligned in most cases, but no space is wasted
 - `Aligned4`: The state field is followed by 3 bytes of padding
-  - This is *the default*, hopefully a good compromise
+  - This is **the default**, hopefully a good compromise
   - A reference type still gets 8 bytes at the beginning of the struct
 - `Aligned8`: The state field is followed by 7 bytes of padding
   - A reference type still gets 8 bytes at the beginning of the struct
@@ -103,7 +103,7 @@ And, of course, at the end of the struct the runtime will probably pad to the ne
 My main motivation was to finally learn more about writing source generators by creating one myself.
 I haven't found a lot of resources regarding _generic_ marker attributes in combination with source generators, so I'm not sure my approach is optimal, but maybe it can serve as a starting point for others.
 
-As a first project I wanted something with a small scope and I was always a little annoyed by the property names (`T0`, `T1`, ...) in the `OneOf` library (which they have to use due to the types being generic -- even when using their source generator).
+As a first project I wanted something with a small scope and I was always a little annoyed by the property names (`T0`, `T1`, ...) in the `OneOf` library (which they have to use due to the types being generic - even when using their source generator).
 So this is what I decided to tackle.
 
 ## Quality
@@ -113,4 +113,4 @@ I will probably use it in my own projects in the future to see how far I'll get 
 
 Feedback (and PRs 😉) to make the implementation more robust, efficient and generally better are welcome, of course!
 
-> Don't expect production grade reliability here.
+> Don't expect production grade reliability here!
