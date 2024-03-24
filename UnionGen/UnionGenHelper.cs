@@ -6,7 +6,7 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
 {
     private const string InteropNamespace = "System.Runtime.InteropServices";
     private const string PointerSizeGuardTypeName = $"{GenNamespace}.PointerSizeGuard";
-    private const string PointerSizeGuardMethodName = "EnsureInitialized";
+    private const string PointerSizeGuardMethodName = "EnsureAlignment";
     private const string TypeLookupFunc = "GetActualTypeName";
     private const string IndexParameterName = "index";
     private const string ActualTypeIndexParameterName = "actualTypeIndex";
@@ -19,6 +19,7 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
     private const string GenNamespace = "UnionGen";
     private const string StateByteTypeName = $"{GenNamespace}.StateByte";
     private const string RefTypeIndex = $"{StateByteTypeName}.RefTypeIndex";
+    private const int MinReferenceTypeSize = 8;
 
     public string GeneratePartialStruct()
     {
@@ -322,7 +323,10 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
     {
         var constructor = new IndentedStringBuilder(0, $"static {union.Name}(){IndentedStringBuilder.NewLine}");
         constructor.AppendLine("{", 2);
-        constructor.AppendLine($"{PointerSizeGuardTypeName}.{PointerSizeGuardMethodName}();", 3);
+        
+        // we use at least 8 byte for a reference type, but potentially more
+        constructor.AppendLine($"{PointerSizeGuardTypeName}.{PointerSizeGuardMethodName}({Math.Max(MinReferenceTypeSize, union.RequestedAlignment)});", 3);
+        
         constructor.AppendLine("}", 2);
 
         return constructor.ToString();
@@ -408,15 +412,16 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
 
     private (int StateOffset, int ValueOffset) GetOffsets()
     {
-        // for simplicity, we assume 64-bit system with 8 byte pointer size, because most common these days
+        // for safety, we assume 64-bit system with 8 byte pointer size, because most common these days
         // 32-bit systems will waste 4 bytes here
-        // larger pointer sizes are not supported and <see cref="PointerSizeGuard"/> will throw an exception
         var stateOffset = union.AnyReferenceType()
-            ? 8
+            ? union.RequestedAlignment > MinReferenceTypeSize
+                ? union.RequestedAlignment
+                : MinReferenceTypeSize
             : 0;
         
         // the state is stored in a single byte
-        var valueOffset = stateOffset + 1;
+        var valueOffset = stateOffset + Math.Max(1, union.RequestedAlignment);
 
         return (stateOffset, valueOffset);
     }

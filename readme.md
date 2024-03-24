@@ -58,8 +58,43 @@ We try to be smart and use as little memory as possible for the union object.
 - A single `byte` is used for storing the state so that they union object knows _what_ it is
 
 So the _minimal_ size is 3 bytes (1 for state, 1 for each of the two min. required types) and the _maximal_ size is 9 bytes (1 for state and 8 for the reference type) + the size of the largest value type.
+Plus padding for alignment (see below).
 
-> We assume 8 bytes for reference types, so 32bit targets waste some space and larger pointer sizes are not supported at all.
+> We assume 8 bytes for reference types, so 32bit targets waste some space and larger pointer sizes *explicit* alignment configuration is required!
+
+### Alignment
+
+There is always a little trade-off between memory and performance.
+Usually, especially since we use `readonly` structs, it is better to sacrifice a few bytes to getter better alignment of the fields.
+
+> As far as I know it is not possible to get the size of a type at compile time, so we cannot automatically make the optimal decision here.
+
+Alignment can be configured for each union type individually by passing one of the `UnionAlignment` `enum` values to the attributes constructor like so:
+
+```csharp
+[Union<Result<int>, NotFound>(UnionAlignment.Aligned8)]
+public readonly partial struct Foo;
+```
+
+At this point there are four options:
+
+- `Unaligned`: No padding is added to the state field
+  - A reference type still gets 8 bytes at the beginning of the struct
+  - Value type fields are placed directly after the state field - this will result in those being misaligned in most cases, but no space is wasted
+- `Aligned4`: The state field is followed by 3 bytes of padding
+  - This is *the default*, hopefully a good compromise
+  - A reference type still gets 8 bytes at the beginning of the struct
+- `Aligned8`: The state field is followed by 7 bytes of padding
+  - A reference type still gets 8 bytes at the beginning of the struct
+  - This setting should work well for 64bit targets, but wastes quite a bit of space
+- `Aligned16`: The state field is followed by 15 bytes of padding
+  - A reference type still _also_ gets 16 bytes at the beginning of the struct
+    - In case you have a special system with 16 byte pointers, this can be used to reserve enough space 
+  - This setting might be useful for SIMD scenarios or other special cases
+
+I ran several benchmarks and for most scenarios, modern CPUs and runtime it doesn't matter too much anyway - but, you can use this to optimize based on your knowledge of the types used.
+
+And, of course, at the end of the struct the runtime will probably pad to the next 8 byte boundary as well - as usual.
 
 ## Motivation
 

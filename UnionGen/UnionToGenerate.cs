@@ -5,6 +5,7 @@ namespace UnionGen
     internal sealed record UnionToGenerate(
         string Name,
         string Namespace,
+        int RequestedAlignment,
         ValueEqualityArray<TypeParameter> TypeParameters)
     {
         public bool AnyReferenceType()
