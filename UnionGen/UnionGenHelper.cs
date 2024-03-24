@@ -299,6 +299,7 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
             constructors.AppendLine(constructor.ToString());
         }
 
+        constructors.AppendLine("[Obsolete(\"Use one of the constructors with a parameter, this one will configure the union incorrectly\", true)]");
         constructors.AppendLine($"public {union.Name}(): this(0, 0) {{}}");
 
         return constructors.ToString();
