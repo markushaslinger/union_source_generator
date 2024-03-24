@@ -67,7 +67,12 @@ Plus padding for alignment (see below).
 ### Alignment
 
 There is always a little trade-off between memory and performance.
-Usually, especially since we use `readonly` structs, it is better to sacrifice a few bytes to getter better alignment of the fields.
+I expected that it would be better to sacrifice a few bytes to get better alignment of the fields and improve perf.
+As so often, running a few benchmarks proved me wrong 🤔
+
+Unaligned was usually on par and faster much more often than it was slower.
+In any case, the difference were a couple of ms for summing up a million values (with random picking).
+Thus, I decided to keep it _unaligned by default_, but the option to change it, based on your knowledge about the concrete types used, exists as detailed below.
 
 > As far as I know it is not possible to get the size of a type at compile time, so we cannot automatically make the optimal decision here.
 
@@ -81,20 +86,19 @@ public readonly partial struct Foo;
 At this point there are four options:
 
 - `Unaligned`: No padding is added to the state field
+  - This is **the default**
   - A reference type still gets 8 bytes at the beginning of the struct
   - Value type fields are placed directly after the state field - this will result in those being misaligned in most cases, but no space is wasted
 - `Aligned4`: The state field is followed by 3 bytes of padding
-  - This is **the default**, hopefully a good compromise
   - A reference type still gets 8 bytes at the beginning of the struct
+  - Should work well for 32bit targets or field with a natural alignment of 4 bytes
 - `Aligned8`: The state field is followed by 7 bytes of padding
   - A reference type still gets 8 bytes at the beginning of the struct
-  - This setting should work well for 64bit targets, but wastes quite a bit of space
+  - This setting should work well for 64bit targets, or fields with a natural alignment of 8 bytes, but wastes quite a bit of space
 - `Aligned16`: The state field is followed by 15 bytes of padding
   - A reference type still _also_ gets 16 bytes at the beginning of the struct
     - In case you have a special system with 16 byte pointers, this can be used to reserve enough space 
   - This setting might be useful for SIMD scenarios or other special cases
-
-I ran several benchmarks and for most scenarios, modern CPUs and runtime it doesn't matter too much anyway - but, you can use this to optimize based on your knowledge of the types used.
 
 And, of course, at the end of the struct the runtime will probably pad to the next 8 byte boundary as well - as usual.
 
