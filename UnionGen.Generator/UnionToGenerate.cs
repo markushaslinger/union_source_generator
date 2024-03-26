@@ -6,7 +6,8 @@ namespace UnionGen
         string Name,
         string Namespace,
         int RequestedAlignment,
-        ValueEqualityArray<TypeParameter> TypeParameters)
+        ValueEqualityArray<TypeParameter> TypeParameters,
+        ValueEqualityArray<ParentType> ParentTypes)
     {
         public bool AnyReferenceType()
         {
@@ -21,6 +22,13 @@ namespace UnionGen
 
             return false;
         }
+    }
+
+    internal readonly record struct ParentType(string Name, string Type)
+    {
+        public const string Class = "class";
+        public const string Struct = "struct";
+        public const string Interface = "interface";
     }
 
     internal sealed record TypeParameter(string Name, string FullName, bool IsReferenceType)

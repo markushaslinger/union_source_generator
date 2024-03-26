@@ -38,4 +38,8 @@
       <ProjectReference Include="..\UnionGen\UnionGen.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Snapshots\" />
+    </ItemGroup>
+
 </Project>

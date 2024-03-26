@@ -1,5 +1,6 @@
 ﻿using UnionDemo;
 using UnionGen.Types;
+using UnionTest;
 
 var demo = new DemoObj(4);
 Console.WriteLine(demo.IsInt);
@@ -22,6 +23,8 @@ simple.Switch(r => Console.WriteLine($"Found: {r}"),
               _ => Console.WriteLine("not found"));
 var res = simple.Match(r => r.Value * 2,
                        _ => -1);
+
+var nested = new INested.Nested(42);
 
 return;
 

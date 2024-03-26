@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
@@ -112,7 +113,7 @@ public sealed class UnionSourceGen : IIncrementalGenerator
         }
 
         var annotatedType = structSyntax.Identifier.Text;
-        var structSymbol = semanticModel.GetDeclaredSymbol(structSyntax);
+        var structSymbol = ModelExtensions.GetDeclaredSymbol(semanticModel, structSyntax);
 
         if (structSymbol?.ContainingNamespace is null
             || string.IsNullOrWhiteSpace(structSymbol.ContainingNamespace.Name))
@@ -121,9 +122,54 @@ public sealed class UnionSourceGen : IIncrementalGenerator
         }
 
         var structNamespace = structSymbol.ContainingNamespace.ToDisplayString();
+        var parentTypes = HandleNestedTypes(structSyntax, annotatedType);
         
         return new UnionToGenerate(annotatedType, structNamespace, alignment.Value, 
-                                   new(typeNames));
+                                   new(typeNames),
+                                   new (parentTypes));
+    }
+
+    private static List<ParentType> HandleNestedTypes(StructDeclarationSyntax structSyntax, string typeName)
+    {
+        if (structSyntax.Parent is NamespaceDeclarationSyntax)
+        {
+            return [];
+        }
+
+        var parentTypes = new List<ParentType>();
+        var currentType = structSyntax.Parent;
+        do
+        {
+            if (currentType is TypeDeclarationSyntax typeDeclaration)
+            {
+                if (!typeDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword))
+                {
+                    throw new NotSupportedException("Union type can only be nested within a partial type");
+                }
+                
+                var name = typeDeclaration.Identifier.Text;
+                switch (typeDeclaration)
+                {
+                    case ClassDeclarationSyntax:
+                        parentTypes.Add(new ParentType(name, ParentType.Class));
+
+                        break;
+                    case InterfaceDeclarationSyntax:
+                        parentTypes.Add(new ParentType(name, ParentType.Interface));
+
+                        break;
+                    case StructDeclarationSyntax:
+                        parentTypes.Add(new ParentType(name, ParentType.Struct));
+
+                        break;
+                    default:
+                        throw new NotSupportedException($"Union type cannot be declared nested in {typeDeclaration.Kind()}");
+                }
+            }
+            currentType = currentType?.Parent;
+        } while (currentType is not null && currentType is not NamespaceDeclarationSyntax);
+
+        return parentTypes;
     }
     
     private static int DetermineRequestedAlignment(AttributeArgumentListSyntax? argumentList)
@@ -153,7 +199,7 @@ public sealed class UnionSourceGen : IIncrementalGenerator
         var typeNames = new List<TypeParameter>(genericName.TypeArgumentList.Arguments.Count);
         foreach (var argument in genericName.TypeArgumentList.Arguments)
         {
-            var typeSymbol = semanticModel.GetTypeInfo(argument).Type;
+            var typeSymbol = ModelExtensions.GetTypeInfo(semanticModel, argument).Type;
             if (typeSymbol is null)
             {
                 return null;

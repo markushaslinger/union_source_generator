@@ -23,6 +23,7 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
 
     public string GeneratePartialStruct()
     {
+        var (prefixNesting, postfixNesting) = GetParentTypeNesting();
         var (typeFields, typeProperties) = GenerateFieldsAndProperties();
 
         var code = $$"""
@@ -30,6 +31,7 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
                      #nullable enable
                      namespace {{union.Namespace}}
                      {
+                     {{prefixNesting}}
                          [{{InteropNamespace}}.StructLayout({{InteropNamespace}}.LayoutKind.Explicit)]
                          public readonly partial struct {{union.Name}} : IEquatable<{{union.Name}}>
                          {
@@ -44,10 +46,32 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
                      {{GenerateEqualityMembers()}}
                      {{GenerateGetActualTypeName()}}
                          }
+                     {{postfixNesting}}
                      }
                      """;
 
         return code;
+    }
+
+    private (string? PrefixNesting, string? PostfixNesting) GetParentTypeNesting()
+    {
+        if (union.ParentTypes.Count == 0)
+        {
+            return (string.Empty, string.Empty);
+        }
+        
+        var prefix = new StringBuilder();
+        foreach (var parentType in union.ParentTypes.Reverse())
+        {
+            prefix.AppendLine($"public partial {parentType.Type} {parentType.Name} {{");
+        }
+        var postfix = new StringBuilder();
+        for (var i = 0; i < union.ParentTypes.Count; i++)
+        {
+            postfix.AppendLine("}");
+        }
+        
+        return (prefix.ToString(), postfix.ToString());
     }
 
     private string GenerateEqualityMembers()

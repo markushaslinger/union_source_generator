@@ -11,8 +11,8 @@ public sealed class UnionGeneratorSnapshotTests
                      using UnionGen;
                      
                      [ProtoMember(1)]
-                     [Union<int,string>]
-                     public partial struct DemoObj;
+                     [UnionGen.Union<int,string>]
+                     public readonly partial struct DemoObj;
                      """;
 
         // Pass the source code to our helper and snapshot test the output
@@ -30,6 +30,25 @@ public sealed class UnionGeneratorSnapshotTests
                      [ProtoMember(1)]
                      [Union<int,long[]>(UnionAlignment.Aligned8)]
                      public partial struct DemoObj;
+                     """;
+
+        // Pass the source code to our helper and snapshot test the output
+        return SnapshotTestHelper.Verify(source);
+    }
+    
+    [Fact]
+    public Task GeneratesUnionStructCorrectly_NestedType()
+    {
+        // The source code to test
+        var source = """
+                     namespace Test1;
+                     using UnionGen;
+                     
+                     public interface INested
+                     {
+                         [UnionGen.Union<int, double, long>]
+                         public readonly partial struct Nested;
+                     }
                      """;
 
         // Pass the source code to our helper and snapshot test the output
