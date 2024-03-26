@@ -7,7 +7,8 @@ namespace UnionGen
         string Namespace,
         int RequestedAlignment,
         ValueEqualityArray<TypeParameter> TypeParameters,
-        ValueEqualityArray<ParentType> ParentTypes)
+        ValueEqualityArray<ParentType> ParentTypes,
+        ValueEqualityArray<DiagnosticHelper.Error> Errors)
     {
         public bool AnyReferenceType()
         {
