@@ -1,46 +1,39 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-    <ImplicitUsings>true</ImplicitUsings>
-    <LangVersion>Latest</LangVersion>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <RootNamespace>UnionGen</RootNamespace>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <InternalsVisibleTo Include="UnionGen.Test" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.9.2" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
-  </ItemGroup>
+    <ItemGroup>
+        <None Include="$(OutputPath)\UnionGen.Generator.dll" Pack="true"
+              PackagePath="analyzers/dotnet/cs" Visible="false" />
+        <!-- <None Include="$(OutputPath)\UnionGen.dll" Pack="true" PackagePath="lib\net8.0" Visible="true"/> -->
+        <None Include="../readme.md" Pack="true" Link="readme.md" PackagePath="" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-      <_Parameter1>UnionGen.Test</_Parameter1>
-    </AssemblyAttribute>
-  </ItemGroup>
+    <PropertyGroup>
+        <Title>Union Source Generator</Title>
+        <Description>A source generator for creating C# union types via a generic marker attribute.</Description>
+        <PackageId>UnionGen</PackageId>
+        <PackageReadmeFile>readme.md</PackageReadmeFile>
+        <PackageVersion>1.2.0-preview1</PackageVersion>
+        <Authors>M. Haslinger</Authors>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageTags>union;source generator</PackageTags>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <RepositoryUrl>https://github.com/markushaslinger/union_source_generator</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true"
-          PackagePath="analyzers/dotnet/cs" Visible="false" />
-    <None Include="../readme.md" Pack="true" Link="readme.md" PackagePath="" />
-  </ItemGroup>
-
-  <PropertyGroup>
-    <IncludeBuildOutput>false</IncludeBuildOutput>
-  </PropertyGroup>
-  
-  <PropertyGroup>
-    <Title>Union Source Generator</Title>
-    <Description>A source generator for creating C# union types via a generic marker attribute.</Description>
-    <PackageId>UnionGen</PackageId>
-    <PackageReadmeFile>readme.md</PackageReadmeFile>
-    <PackageVersion>1.1.4</PackageVersion>
-    <Authors>M. Haslinger</Authors>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageTags>union;source generator</PackageTags>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <RepositoryUrl>https://github.com/markushaslinger/union_source_generator</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-  </PropertyGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\UnionGen.Generator\UnionGen.Generator.csproj" />
+    </ItemGroup>
 
 </Project>
