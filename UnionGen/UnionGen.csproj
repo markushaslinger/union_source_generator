@@ -12,9 +12,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="$(OutputPath)\UnionGen.Generator.dll" Pack="true"
-              PackagePath="analyzers/dotnet/cs" Visible="false" />
-        <!-- <None Include="$(OutputPath)\UnionGen.dll" Pack="true" PackagePath="lib\net8.0" Visible="true"/> -->
+        <None Include="$(MSBuildThisFileDirectory)..\UnionGen.Generator\bin\$(Configuration)\netstandard2.0\UnionGen.Generator.dll" 
+              Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
         <None Include="../readme.md" Pack="true" Link="readme.md" PackagePath="" />
     </ItemGroup>
 
@@ -23,7 +22,7 @@
         <Description>A source generator for creating C# union types via a generic marker attribute.</Description>
         <PackageId>UnionGen</PackageId>
         <PackageReadmeFile>readme.md</PackageReadmeFile>
-        <PackageVersion>1.2.0-preview1</PackageVersion>
+        <PackageVersion>1.2.0-preview2</PackageVersion>
         <Authors>M. Haslinger</Authors>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageTags>union;source generator</PackageTags>
@@ -33,7 +32,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\UnionGen.Generator\UnionGen.Generator.csproj" />
+      <!--  <ProjectReference Include="..\UnionGen.Generator\UnionGen.Generator.csproj" /> -->
     </ItemGroup>
 
 </Project>
