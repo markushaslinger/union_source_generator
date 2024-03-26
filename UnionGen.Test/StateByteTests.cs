@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using UnionGen.InternalUtil;
 
 namespace UnionGen.Test;
 

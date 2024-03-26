@@ -9,6 +9,7 @@ jobs:
     env:
       BUILD_CONFIG: 'Release'
       PROJ_DIR: ${{github.workspace}}/UnionGen
+      GEN_PROJ_DIR: ${{github.workspace}}/UnionGen.Generator
       NUGET_DIR: ${{github.workspace}}/nupkgs
 
     runs-on: ubuntu-latest
@@ -23,6 +24,9 @@ jobs:
           dotnet-version: 8.0.x
       - name: Create Package Directory
         run: mkdir nupkgs
+      - name: Build Generator Assembly
+        run: dotnet build -c Release
+        working-directory: ${{env.GEN_PROJ_DIR}}
       - name: Pack
         run: dotnet pack -c ${{env.BUILD_CONFIG}} --output ${{env.NUGET_DIR}}
         working-directory: ${{env.PROJ_DIR}}

@@ -5,7 +5,7 @@ namespace UnionGen;
 internal readonly struct UnionGenHelper(UnionToGenerate union)
 {
     private const string InteropNamespace = "System.Runtime.InteropServices";
-    private const string PointerSizeGuardTypeName = $"{GenNamespace}.PointerSizeGuard";
+    private const string PointerSizeGuardTypeName = $"{GenNamespace}.InternalUtil.PointerSizeGuard";
     private const string PointerSizeGuardMethodName = "EnsureAlignment";
     private const string TypeLookupFunc = "GetActualTypeName";
     private const string IndexParameterName = "index";
@@ -17,7 +17,7 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
     private const string ValueFieldNamePrefix = $"_{ValueParameterName}";
     private const string RefValueFieldName = $"_{ValueParameterName}Ref";
     private const string GenNamespace = "UnionGen";
-    private const string StateByteTypeName = $"{GenNamespace}.StateByte";
+    private const string StateByteTypeName = $"{GenNamespace}.InternalUtil.StateByte";
     private const string RefTypeIndex = $"{StateByteTypeName}.RefTypeIndex";
     private const int MinReferenceTypeSize = 8;
 
