@@ -7,7 +7,7 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
     private const string InteropNamespace = "System.Runtime.InteropServices";
     private const string PointerSizeGuardTypeName = $"{GenNamespace}.InternalUtil.PointerSizeGuard";
     private const string PointerSizeGuardMethodName = "EnsureAlignment";
-    private const string TypeLookupFunc = "GetActualTypeName";
+    private const string TypeLookupFunc = "GetTypeName";
     private const string IndexParameterName = "index";
     private const string ActualTypeIndexParameterName = "actualTypeIndex";
     private const string StateByteFieldName = "_state";
@@ -19,6 +19,8 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
     private const string GenNamespace = "UnionGen";
     private const string StateByteTypeName = $"{GenNamespace}.InternalUtil.StateByte";
     private const string RefTypeIndex = $"{StateByteTypeName}.RefTypeIndex";
+    private const string ThrowHelperType = $"{GenNamespace}.InternalUtil.ThrowHelper";
+    private const string ConstantsType = $"{GenNamespace}.InternalUtil.UnionGenInternalConst";
     private const int MinReferenceTypeSize = 8;
 
     public string GeneratePartialStruct()
@@ -44,7 +46,7 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
                      {{GenerateSwitch()}}
                      {{GenerateToString()}}
                      {{GenerateEqualityMembers()}}
-                     {{GenerateGetActualTypeName()}}
+                     {{GenerateGetTypeName()}}
                          }
                      {{postfixNesting}}
                      }
@@ -153,7 +155,7 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
                                  : $"case {i}: {actionName}({ValueFieldNamePrefix}{i}); break;");
         }
 
-        cases.AppendLine($"default: throw new InvalidOperationException($\"Unknown type index {{{IndexPropertyName}}}\");");
+        cases.AppendLine($"default: throw {ThrowHelperType}.ThrowUnknownTypeIndex({ActualTypeIndexPropertyName});");
 
         var switchMethod = new IndentedStringBuilder(2, "public void Switch(");
         switchMethod.Append(parameters.ToString());
@@ -188,7 +190,7 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
                                  : $"{i} => {funcName}({ValueFieldNamePrefix}{i}),");
         }
 
-        cases.AppendLine($"_ => throw new InvalidOperationException($\"Unknown type index {{{IndexPropertyName}}}\")");
+        cases.AppendLine($"_ => throw {ThrowHelperType}.ThrowUnknownTypeIndex({ActualTypeIndexPropertyName})");
 
         var matchMethod = new IndentedStringBuilder(2, $"public TResult Match<TResult>({parameters})");
         matchMethod.Append(" => ");
@@ -221,10 +223,10 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
 
         if (anyRefType)
         {
-            cases.AppendLine($"{RefTypeIndex} => {RefValueFieldName}?.ToString() ?? \"null\",");
+            cases.AppendLine($"{RefTypeIndex} => {RefValueFieldName}?.ToString() ?? {ConstantsType}.NullString,");
         }
 
-        cases.AppendLine($"_ => throw new InvalidOperationException($\"Unknown type index {{{IndexPropertyName}}}\")");
+        cases.AppendLine($"_ => throw {ThrowHelperType}.ThrowUnknownTypeIndex({IndexPropertyName})");
 
         var toStringMethod = new IndentedStringBuilder(2, "public override string ToString()");
         toStringMethod.Append(" => ");
@@ -324,7 +326,7 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
             constructors.AppendLine(constructor.ToString());
         }
 
-        constructors.AppendLine("[Obsolete(\"Use one of the constructors with a parameter, this one will configure the union incorrectly\", true)]");
+        constructors.AppendLine($"[Obsolete({ConstantsType}.DefaultConstructorWarning, true)]");
         constructors.AppendLine($"public {union.Name}(): this(0, 0) {{}}");
 
         return constructors.ToString();
@@ -356,10 +358,10 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
         return constructor.ToString();
     }
 
-    private string GenerateGetActualTypeName()
+    private string GenerateGetTypeName()
     {
-        var func = new IndentedStringBuilder(2, $"public string {TypeLookupFunc}() =>{IndentedStringBuilder.NewLine}");
-        func.AppendLine($"{ActualTypeIndexPropertyName} switch ", 1);
+        var func = new IndentedStringBuilder(2, $"public string {TypeLookupFunc}(int index) =>{IndentedStringBuilder.NewLine}");
+        func.AppendLine($"index switch ", 1);
         func.AppendLine("{", 1);
         for (var i = 0; i < union.TypeParameters.Count; i++)
         {
@@ -367,7 +369,7 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
             func.AppendLine($"{i} => \"{type.FullName}\",", 2);
         }
 
-        func.AppendLine($"_ => throw new InvalidOperationException($\"Unknown type index {{{ActualTypeIndexPropertyName}}}\")",
+        func.AppendLine($"_ => throw {ThrowHelperType}.ThrowUnknownTypeIndex(index)",
                         2);
         func.AppendLine("};", 1);
 
@@ -386,7 +388,7 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
                                      ? $"? ({type.FullName}) {RefValueFieldName}!"
                                      : $"? {ValueFieldNamePrefix}{i}",
                                  2);
-            accessors.AppendLine($": throw new InvalidOperationException($\"Is not of type {type.FullName} but type {{{TypeLookupFunc}()}}\");",
+            accessors.AppendLine($": throw {ThrowHelperType}.ThrowNotOfType({TypeLookupFunc}({i}), {TypeLookupFunc}({ActualTypeIndexPropertyName}));",
                                  2);
 
             if (i < union.TypeParameters.Count - 1)

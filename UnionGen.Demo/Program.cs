@@ -18,6 +18,7 @@ demo2.Switch(forInt: _ => {},
 var simple = new SimpleObj(new Result<int>(12));
 var found = simple.IsNotFound;
 var result = simple.AsResultOfInt32();
+Console.WriteLine(result);
 
 simple.Switch(r => Console.WriteLine($"Found: {r}"),
               _ => Console.WriteLine("not found"));
