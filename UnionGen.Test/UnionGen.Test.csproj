@@ -34,9 +34,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\UnionGen\UnionGen.csproj"
-                          OutputItemType="Analyzer"
-                          ReferenceOutputAssembly="false"/>
+      <ProjectReference Include="..\UnionGen.Generator\UnionGen.Generator.csproj" />
       <ProjectReference Include="..\UnionGen\UnionGen.csproj" />
     </ItemGroup>
 
