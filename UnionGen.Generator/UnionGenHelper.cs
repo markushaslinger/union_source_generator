@@ -5,8 +5,6 @@ namespace UnionGen;
 internal readonly struct UnionGenHelper(UnionToGenerate union)
 {
     private const string InteropNamespace = "System.Runtime.InteropServices";
-    private const string PointerSizeGuardTypeName = $"{GenNamespace}.InternalUtil.PointerSizeGuard";
-    private const string PointerSizeGuardMethodName = "EnsureAlignment";
     private const string TypeLookupFunc = "GetTypeName";
     private const string IndexParameterName = "index";
     private const string ActualTypeIndexParameterName = "actualTypeIndex";
@@ -21,7 +19,6 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
     private const string RefTypeIndex = $"{StateByteTypeName}.RefTypeIndex";
     private const string ThrowHelperType = $"{GenNamespace}.InternalUtil.ThrowHelper";
     private const string ConstantsType = $"{GenNamespace}.InternalUtil.UnionGenInternalConst";
-    private const int MinReferenceTypeSize = 8;
 
     public string GeneratePartialStruct()
     {
@@ -35,7 +32,6 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
                      namespace {{union.Namespace}}
                      {
                      {{prefixNesting}}
-                         [{{InteropNamespace}}.StructLayout({{InteropNamespace}}.LayoutKind.Explicit)]
                          public readonly partial struct {{union.Name}} : IEquatable<{{union.Name}}>
                          {
                      {{typeFields}}
@@ -298,7 +294,6 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
     private string GenerateConstructors()
     {
         var constructors = new IndentedStringBuilder(2);
-        constructors.AppendLine(GenerateStaticConstructor());
         constructors.AppendLine(GeneratePrivateConstructor());
 
         for (var i = 0; i < union.TypeParameters.Count; i++)
@@ -341,19 +336,6 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
         constructor.AppendLine("{", 2);
         constructor.AppendLine($"{StateByteFieldName} = new {StateByteTypeName}({IndexParameterName}, {ActualTypeIndexParameterName});",
                                3);
-        constructor.AppendLine("}", 2);
-
-        return constructor.ToString();
-    }
-
-    private string GenerateStaticConstructor()
-    {
-        var constructor = new IndentedStringBuilder(0, $"static {union.Name}(){IndentedStringBuilder.NewLine}");
-        constructor.AppendLine("{", 2);
-        
-        // we use at least 8 byte for a reference type, but potentially more
-        constructor.AppendLine($"{PointerSizeGuardTypeName}.{PointerSizeGuardMethodName}({Math.Max(MinReferenceTypeSize, union.RequestedAlignment)});", 3);
-        
         constructor.AppendLine("}", 2);
 
         return constructor.ToString();
@@ -403,53 +385,29 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
 
     private (string TypeFields, string TypeProperties) GenerateFieldsAndProperties()
     {
-        var (stateOffset, valueOffset) = GetOffsets();
         var typeProperties = new IndentedStringBuilder(2);
         var typeFields = new IndentedStringBuilder(2);
-        typeFields.AppendLine($"[{InteropNamespace}.FieldOffset({stateOffset})]");
-        typeFields.AppendLine($"private readonly {StateByteTypeName} {StateByteFieldName};");
 
-        var refFieldCreated = false;
+        if (union.AnyReferenceType())
+        {
+            typeFields.AppendLine($"private readonly object? {RefValueFieldName};");
+        }
+        
         for (var i = 0; i < union.TypeParameters.Count; i++)
         {
             var type = union.TypeParameters[i];
 
-            if (type.IsReferenceType)
+            if (!type.IsReferenceType)
             {
-                if (!refFieldCreated)
-                {
-                    // if we have a ref type, it always goes first due to the fixed size (we assume 8 byte)
-                    typeFields.AppendLine($"[{InteropNamespace}.FieldOffset(0)]");
-                    typeFields.AppendLine($"private readonly object? {RefValueFieldName};");
-                    refFieldCreated = true;
-                }
-            }
-            else
-            {
-                typeFields.AppendLine($"[{InteropNamespace}.FieldOffset({valueOffset})]");
                 typeFields.AppendLine($"private readonly {type.FullName} {ValueFieldNamePrefix}{i};");
             }
 
             var index = type.IsReferenceType ? RefTypeIndex : i.ToString();
             typeProperties.AppendLine($"public bool Is{type.TitleCaseName} => {IndexPropertyName} == {index};");
         }
+        
+        typeFields.AppendLine($"private readonly {StateByteTypeName} {StateByteFieldName};");
 
         return (typeFields.ToString(), typeProperties.ToString());
-    }
-
-    private (int StateOffset, int ValueOffset) GetOffsets()
-    {
-        // for safety, we assume 64-bit system with 8 byte pointer size, because most common these days
-        // 32-bit systems will waste 4 bytes here
-        var stateOffset = union.AnyReferenceType()
-            ? union.RequestedAlignment > MinReferenceTypeSize
-                ? union.RequestedAlignment
-                : MinReferenceTypeSize
-            : 0;
-        
-        // the state is stored in a single byte
-        var valueOffset = stateOffset + Math.Max(1, union.RequestedAlignment);
-
-        return (stateOffset, valueOffset);
     }
 }

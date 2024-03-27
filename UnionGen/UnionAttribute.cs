@@ -10,50 +10,20 @@ public static class CompileConst
 
 [Conditional(CompileConst.IncludeAttribute)]
 [AttributeUsage(AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
-public sealed class UnionAttribute<T1, T2> : Attribute
-{
-    public UnionAttribute(UnionAlignment alignment = UnionAlignment.Unaligned)
-    {
-        _ = alignment;
-    }
-}
+public sealed class UnionAttribute<T1, T2> : Attribute;
 
 [Conditional(CompileConst.IncludeAttribute)]
 [AttributeUsage(AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
-public sealed class UnionAttribute<T1, T2, T3> : Attribute
-{
-    public UnionAttribute(UnionAlignment alignment = UnionAlignment.Unaligned)
-    {
-        _ = alignment;
-    }
-}
+public sealed class UnionAttribute<T1, T2, T3> : Attribute;
 
 [Conditional(CompileConst.IncludeAttribute)]
 [AttributeUsage(AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
-public sealed class UnionAttribute<T1, T2, T3, T4> : Attribute
-{
-    public UnionAttribute(UnionAlignment alignment = UnionAlignment.Unaligned)
-    {
-        _ = alignment;
-    }
-}
+public sealed class UnionAttribute<T1, T2, T3, T4> : Attribute;
 
 [Conditional(CompileConst.IncludeAttribute)]
 [AttributeUsage(AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
-public sealed class UnionAttribute<T1, T2, T3, T4, T5> : Attribute
-{
-    public UnionAttribute(UnionAlignment alignment = UnionAlignment.Unaligned)
-    {
-        _ = alignment;
-    }
-}
+public sealed class UnionAttribute<T1, T2, T3, T4, T5> : Attribute;
 
 [Conditional(CompileConst.IncludeAttribute)]
 [AttributeUsage(AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
-public sealed class UnionAttribute<T1, T2, T3, T4, T5, T6> : Attribute
-{
-    public UnionAttribute(UnionAlignment alignment = UnionAlignment.Unaligned)
-    {
-        _ = alignment;
-    }
-}
+public sealed class UnionAttribute<T1, T2, T3, T4, T5, T6> : Attribute;
