@@ -1,27 +1,45 @@
-﻿namespace UnionGen.Types;
+﻿using System.Runtime.InteropServices;
 
+namespace UnionGen.Types;
+
+[StructLayout(LayoutKind.Sequential, Size = 1)]
 public readonly struct Yes;
 
+[StructLayout(LayoutKind.Sequential, Size = 1)]
 public readonly struct No;
 
+[StructLayout(LayoutKind.Sequential, Size = 1)]
 public readonly struct Unknown;
 
+[StructLayout(LayoutKind.Sequential, Size = 1)]
 public readonly struct True;
 
+[StructLayout(LayoutKind.Sequential, Size = 1)]
 public readonly struct False;
 
+[StructLayout(LayoutKind.Sequential, Size = 1)]
 public readonly struct All;
 
+[StructLayout(LayoutKind.Sequential, Size = 1)]
 public readonly struct Some;
 
+[StructLayout(LayoutKind.Sequential, Size = 1)]
 public readonly struct None;
 
+[StructLayout(LayoutKind.Sequential, Size = 1)]
 public readonly struct Found;
+
+[StructLayout(LayoutKind.Sequential, Size = 1)]
 public readonly struct NotFound;
 
+[StructLayout(LayoutKind.Sequential, Size = 1)]
 public readonly struct Failure;
 
+[StructLayout(LayoutKind.Sequential, Size = 1)]
 public readonly struct Success;
+
+[StructLayout(LayoutKind.Sequential, Size = 1)]
+public struct Irrelevant;
 
 public readonly struct Success<T>
 {
@@ -43,6 +61,7 @@ public readonly struct Result<T>
     public T Value { get; }
 }
 
+[StructLayout(LayoutKind.Sequential, Size = 1)]
 public readonly struct Error;
 
 public readonly struct Error<T>
