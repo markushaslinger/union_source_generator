@@ -16,7 +16,10 @@ public readonly struct Some;
 
 public readonly struct None;
 
+public readonly struct Found;
 public readonly struct NotFound;
+
+public readonly struct Failure;
 
 public readonly struct Success;
 
