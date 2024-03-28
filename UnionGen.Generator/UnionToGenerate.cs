@@ -5,7 +5,7 @@ namespace UnionGen
     internal sealed record UnionToGenerate(
         string Name,
         string Namespace,
-        int RequestedAlignment,
+        string Visibility,
         ValueEqualityArray<TypeParameter> TypeParameters,
         ValueEqualityArray<ParentType> ParentTypes,
         ValueEqualityArray<DiagnosticHelper.Error> Errors)
@@ -25,7 +25,7 @@ namespace UnionGen
         }
     }
 
-    internal readonly record struct ParentType(string Name, string Type)
+    internal readonly record struct ParentType(string Name, string Type, string Visibility)
     {
         public const string Class = "class";
         public const string Struct = "struct";

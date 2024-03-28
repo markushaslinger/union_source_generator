@@ -6,7 +6,7 @@ namespace UnionTest;
 public partial interface INested
 {
     [Union<int, double, long>]
-    public readonly partial struct Nested;
+    internal readonly partial struct Nested;
     
     
 }

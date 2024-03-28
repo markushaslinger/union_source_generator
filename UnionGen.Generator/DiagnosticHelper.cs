@@ -24,8 +24,6 @@ internal readonly struct DiagnosticHelper(Action<Diagnostic> reportDiagnostic)
     
     public static class ErrorIds
     {
-        public const int UnionTypeNotPublic = 1;
-        public const int NestingNotPublic = 10;
         public const int NestingNotPartial = 11;
         public const int NestingUnknownParent = 12;
     }

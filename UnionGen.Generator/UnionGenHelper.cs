@@ -4,7 +4,6 @@ namespace UnionGen;
 
 internal readonly struct UnionGenHelper(UnionToGenerate union)
 {
-    private const string InteropNamespace = "System.Runtime.InteropServices";
     private const string TypeLookupFunc = "GetTypeName";
     private const string IndexParameterName = "index";
     private const string ActualTypeIndexParameterName = "actualTypeIndex";
@@ -17,7 +16,7 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
     private const string GenNamespace = "UnionGen";
     private const string StateByteTypeName = $"{GenNamespace}.InternalUtil.StateByte";
     private const string RefTypeIndex = $"{StateByteTypeName}.RefTypeIndex";
-    private const string ThrowHelperType = $"{GenNamespace}.InternalUtil.ThrowHelper";
+    private const string ThrowHelperType = $"{GenNamespace}.InternalUtil.ExceptionHelper";
     private const string ConstantsType = $"{GenNamespace}.InternalUtil.UnionGenInternalConst";
 
     public string GeneratePartialStruct()
@@ -32,7 +31,7 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
                      namespace {{union.Namespace}}
                      {
                      {{prefixNesting}}
-                         public readonly partial struct {{union.Name}} : IEquatable<{{union.Name}}>
+                         {{union.Visibility}} readonly partial struct {{union.Name}} : IEquatable<{{union.Name}}>
                          {
                      {{typeFields}}
                      {{GenerateConstructors()}}
@@ -62,7 +61,7 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
         var prefix = new StringBuilder();
         foreach (var parentType in union.ParentTypes.Reverse())
         {
-            prefix.AppendLine($"public partial {parentType.Type} {parentType.Name} {{");
+            prefix.AppendLine($"{parentType.Visibility} partial {parentType.Type} {parentType.Name} {{");
         }
         var postfix = new StringBuilder();
         for (var i = 0; i < union.ParentTypes.Count; i++)

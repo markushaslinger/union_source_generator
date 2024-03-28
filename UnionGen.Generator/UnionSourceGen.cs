@@ -89,14 +89,7 @@ public sealed class UnionSourceGen : IIncrementalGenerator
             return null;
         }
 
-        DiagnosticHelper.Error? notPublicError = null;
-        if (!structSyntax.Modifiers.Any(m => m.IsKind(SyntaxKind.PublicKeyword)))
-        {
-            notPublicError = new DiagnosticHelper.Error(DiagnosticHelper.ErrorIds.UnionTypeNotPublic, "Union type must be public");
-        }
-
         GenericNameSyntax? genericName = null;
-        int? alignment = null;
         foreach (var attributeList in structSyntax.AttributeLists)
         {
             foreach (var attributeSyntax in attributeList.Attributes)
@@ -105,7 +98,6 @@ public sealed class UnionSourceGen : IIncrementalGenerator
                     && gName.Identifier.ValueText.StartsWith("Union"))
                 {
                     genericName = gName;
-                    alignment = DetermineRequestedAlignment(attributeSyntax.ArgumentList);
 
                     break;
                 }
@@ -117,7 +109,7 @@ public sealed class UnionSourceGen : IIncrementalGenerator
             }
         }
 
-        if (genericName is null || alignment is null)
+        if (genericName is null)
         {
             return null;
         }
@@ -138,14 +130,10 @@ public sealed class UnionSourceGen : IIncrementalGenerator
         }
 
         var structNamespace = structSymbol.ContainingNamespace.ToDisplayString();
+        var structVisibility = GetVisibilityModifier(structSyntax);
         var (parentTypes, errors) = HandleNestedTypes(structSyntax);
-        
-        if (notPublicError is not null)
-        {
-            errors.Add(notPublicError.Value);
-        }
 
-        return new UnionToGenerate(annotatedType, structNamespace, alignment.Value,
+        return new UnionToGenerate(annotatedType, structNamespace, structVisibility,
                                    new(typeNames),
                                    new(parentTypes),
                                    new(errors));
@@ -165,46 +153,36 @@ public sealed class UnionSourceGen : IIncrementalGenerator
         {
             if (currentType is TypeDeclarationSyntax typeDeclaration)
             {
-                var publicFound = false;
                 var partialFound = false;
                 foreach (var modifier in typeDeclaration.Modifiers)
                 {
-                    if (modifier.IsKind(SyntaxKind.PublicKeyword))
-                    {
-                        publicFound = true;
-                    }
-
                     if (modifier.IsKind(SyntaxKind.PartialKeyword))
                     {
                         partialFound = true;
                     }
                 }
+                
                 if (!partialFound)
                 {
                     return ([], [
                         new DiagnosticHelper.Error(DiagnosticHelper.ErrorIds.NestingNotPartial, "Union type can only be nested within a partial typ")
                     ]);
                 }
-                if (!publicFound)
-                {
-                    return ([], [
-                        new DiagnosticHelper.Error(DiagnosticHelper.ErrorIds.NestingNotPublic, "Union type can only be nested within a public type")
-                    ]);
-                }
 
                 var name = typeDeclaration.Identifier.Text;
+                var visibility = GetVisibilityModifier(typeDeclaration);
                 switch (typeDeclaration)
                 {
                     case ClassDeclarationSyntax:
-                        parentTypes.Add(new ParentType(name, ParentType.Class));
+                        parentTypes.Add(new ParentType(name, ParentType.Class, visibility));
 
                         break;
                     case InterfaceDeclarationSyntax:
-                        parentTypes.Add(new ParentType(name, ParentType.Interface));
+                        parentTypes.Add(new ParentType(name, ParentType.Interface, visibility));
 
                         break;
                     case StructDeclarationSyntax:
-                        parentTypes.Add(new ParentType(name, ParentType.Struct));
+                        parentTypes.Add(new ParentType(name, ParentType.Struct, visibility));
 
                         break;
                     default:
@@ -221,28 +199,6 @@ public sealed class UnionSourceGen : IIncrementalGenerator
         } while (currentType is not null && currentType is not NamespaceDeclarationSyntax);
 
         return (parentTypes, []);
-    }
-
-    private static int DetermineRequestedAlignment(AttributeArgumentListSyntax? argumentList)
-    {
-        const int Default = 0;
-
-        var argument = argumentList?.Arguments.FirstOrDefault();
-        if (argument?.Expression is not MemberAccessExpressionSyntax memberAccess)
-        {
-            return Default;
-        }
-
-        var text = memberAccess.Name.Identifier.Text;
-
-        return text switch
-               {
-                   "Unaligned" => 0,
-                   "Aligned4"  => 4,
-                   "Aligned8"  => 8,
-                   "Aligned16" => 16,
-                   _           => Default
-               };
     }
 
     private static List<TypeParameter>? GetTypeParameters(GenericNameSyntax genericName, SemanticModel semanticModel)
@@ -299,5 +255,39 @@ public sealed class UnionSourceGen : IIncrementalGenerator
         }
 
         return name;
+    }
+    
+    private static string GetVisibilityModifier(MemberDeclarationSyntax baseTypeSyntax)
+    {
+        for (var i = 0; i < baseTypeSyntax.Modifiers.Count; i++)
+        {
+            var modifier = baseTypeSyntax.Modifiers[i];
+            switch (modifier.Kind())
+            {
+                case SyntaxKind.PublicKeyword:
+                {
+                    return "public";
+                }
+                case SyntaxKind.PrivateKeyword:
+                {
+                    return "private";
+                }
+                case SyntaxKind.InternalKeyword:
+                {
+                    return "internal";
+                }
+                case SyntaxKind.ProtectedKeyword:
+                {
+                    return "protected";
+                }
+                default:
+                    continue;
+            }
+        }
+
+        // if no visibility modifier is found, it's implicitly private for classes and structs
+        return baseTypeSyntax is ClassDeclarationSyntax or StructDeclarationSyntax 
+            ? "private" 
+            : string.Empty;
     }
 }

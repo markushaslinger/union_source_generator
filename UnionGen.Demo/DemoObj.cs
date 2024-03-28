@@ -5,7 +5,7 @@ using UnionGen.Types;
 namespace UnionDemo
 {
     [Union<int, double, long[], List<Foo>, Dictionary<string, bool>>]
-    public readonly partial struct DemoObj;
+    internal readonly partial struct DemoObj;
 
     [Union<Result<int>, NotFound>]
     public readonly partial struct SimpleObj;

@@ -2,7 +2,7 @@
 
 namespace UnionGen.InternalUtil;
 
-public static class ThrowHelper
+public static class ExceptionHelper
 {
     public static Exception ThrowUnknownTypeIndex(int indexValue) =>
         new InvalidOperationException($"Unknown type index: {indexValue}");
