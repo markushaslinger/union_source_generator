@@ -41,7 +41,7 @@ public readonly struct Success;
 [StructLayout(LayoutKind.Sequential, Size = 1)]
 public struct Irrelevant;
 
-public readonly struct Success<T>
+public readonly record struct Success<T>
 {
     public Success(T value)
     {
@@ -51,7 +51,7 @@ public readonly struct Success<T>
     public T Value { get; }
 }
 
-public readonly struct Result<T>
+public readonly record struct Result<T>
 {
     public Result(T value)
     {
@@ -64,7 +64,7 @@ public readonly struct Result<T>
 [StructLayout(LayoutKind.Sequential, Size = 1)]
 public readonly struct Error;
 
-public readonly struct Error<T>
+public readonly record struct Error<T>
 {
     public Error(T value)
     {

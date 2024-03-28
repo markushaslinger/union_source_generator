@@ -1,4 +1,5 @@
 ﻿using UnionDemo;
+using UnionGen;
 using UnionGen.Types;
 using UnionTest;
 
@@ -27,8 +28,10 @@ var res = simple.Match(r => r.Value * 2,
 
 var nested = new INested.Nested(42);
 
+Console.WriteLine(GetOneOfType());
+
 return;
 
 SimpleObj CreateSimple() => new NotFound();
 
-
+Union<Result<string>, NotFound> GetOneOfType() => new Result<string>("hello");
