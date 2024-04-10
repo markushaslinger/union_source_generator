@@ -4,9 +4,12 @@ namespace UnionGen.InternalUtil;
 
 public readonly struct StateByte
 {
+    private const int ShiftOffset = 4;
     private const int IndexMask = 0b0000_1111;
     private const int ActualTypeMask = 0b1111_0000;
     public const byte RefTypeIndex = IndexMask;
+    
+    private static readonly string outOfRangeMessage = $"Value exceeds the maximum value of {IndexMask} for the index.";
 
     private readonly byte _state;
 
@@ -23,8 +26,7 @@ public readonly struct StateByte
         {
             if (value > IndexMask)
             {
-                throw new ArgumentOutOfRangeException(nameof(value), value,
-                                                      $"Value exceeds the maximum value of {IndexMask} for the index.");
+                throw new ArgumentOutOfRangeException(nameof(value), value, outOfRangeMessage);
             }
 
             var cleanState = _state & ActualTypeMask;
@@ -34,16 +36,15 @@ public readonly struct StateByte
 
     public int ActualTypeIndex
     {
-        get => _state >> 4;
+        get => _state >> ShiftOffset;
         private init
         {
             if (value > IndexMask)
             {
-                throw new ArgumentOutOfRangeException(nameof(value), value,
-                                                      $"Value exceeds the maximum value of {IndexMask} for the actual type index.");
+                throw new ArgumentOutOfRangeException(nameof(value), value, outOfRangeMessage);
             }
 
-            var shiftedValue = value << 4;
+            var shiftedValue = value << ShiftOffset;
             var cleanState = _state & IndexMask;
             _state = (byte) (cleanState | shiftedValue);
         }
