@@ -215,6 +215,7 @@ public sealed class UnionSourceGen : IIncrementalGenerator
             var name = typeSymbol.Name;
             var fullName = typeSymbol.ToString();
             var isReferenceType = typeSymbol.IsReferenceType;
+            var isInterface = typeSymbol.TypeKind == TypeKind.Interface;
             var isBuiltInType = typeSymbol.SpecialType != SpecialType.None;
             if (isBuiltInType)
             {
@@ -235,7 +236,7 @@ public sealed class UnionSourceGen : IIncrementalGenerator
 
             name = SanitizeName(name, fullName);
 
-            typeNames.Add(new TypeParameter(name, fullName, isReferenceType));
+            typeNames.Add(new TypeParameter(name, fullName, isReferenceType, isInterface));
         }
 
         return typeNames;

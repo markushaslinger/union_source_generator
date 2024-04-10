@@ -279,7 +279,7 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
     {
         var operators = new IndentedStringBuilder(2);
 
-        foreach (var type in union.TypeParameters)
+        foreach (var type in union.TypeParameters.Where(tp => !tp.IsInterface))
         {
             operators.AppendLine($"public static implicit operator {union.Name}({type.FullName} {ValueParameterName}) => new {union.Name}({ValueParameterName});");
         }

@@ -32,7 +32,7 @@ namespace UnionGen
         public const string Interface = "interface";
     }
 
-    internal sealed record TypeParameter(string Name, string FullName, bool IsReferenceType)
+    internal sealed record TypeParameter(string Name, string FullName, bool IsReferenceType, bool IsInterface)
     {
         private string? _titleCaseName;
         public string TitleCaseName => _titleCaseName ??= Name.EnsureTitleCase();
