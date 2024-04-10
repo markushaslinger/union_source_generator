@@ -400,9 +400,8 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
             {
                 typeFields.AppendLine($"private readonly {type.FullName} {ValueFieldNamePrefix}{i};");
             }
-
-            var index = type.IsReferenceType ? RefTypeIndex : i.ToString();
-            typeProperties.AppendLine($"public bool Is{type.TitleCaseName} => {IndexPropertyName} == {index};");
+            
+            typeProperties.AppendLine($"public bool Is{type.TitleCaseName} => {ActualTypeIndexPropertyName} == {i};");
         }
         
         typeFields.AppendLine($"private readonly {StateByteTypeName} {StateByteFieldName};");

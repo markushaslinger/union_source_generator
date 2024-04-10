@@ -9,6 +9,7 @@ Console.WriteLine(demo.AsInt());
 
 var demo2 = new DemoObj([1L, 2L, 3L]);
 Console.WriteLine(demo2.IsLongArray);
+Console.WriteLine(demo2.IsListOfFoo);
 demo2.Switch(forInt: _ => {},
              forDouble: _ => {},
              forLongArray: a => Console.WriteLine($"{a.GetType()} {a.Length}"),
