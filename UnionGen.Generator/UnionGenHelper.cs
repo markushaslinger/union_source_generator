@@ -364,8 +364,8 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
         for (var i = 0; i < union.TypeParameters.Count; i++)
         {
             var type = union.TypeParameters[i];
-            accessors.AppendLine($"public {type.FullName} As{type.TitleCaseName}() =>");
-            accessors.AppendLine($"Is{type.TitleCaseName}", 1);
+            accessors.AppendLine($"public {type.FullName} As{type.WellKnownName}() =>");
+            accessors.AppendLine($"Is{type.WellKnownName}", 1);
             accessors.AppendLine(type.IsReferenceType
                                      ? $"? ({type.FullName}) {RefValueFieldName}!"
                                      : $"? {ValueFieldNamePrefix}{i}",
@@ -401,7 +401,7 @@ internal readonly struct UnionGenHelper(UnionToGenerate union)
                 typeFields.AppendLine($"private readonly {type.FullName} {ValueFieldNamePrefix}{i};");
             }
             
-            typeProperties.AppendLine($"public bool Is{type.TitleCaseName} => {ActualTypeIndexPropertyName} == {i};");
+            typeProperties.AppendLine($"public bool Is{type.WellKnownName} => {ActualTypeIndexPropertyName} == {i};");
         }
         
         typeFields.AppendLine($"private readonly {StateByteTypeName} {StateByteFieldName};");

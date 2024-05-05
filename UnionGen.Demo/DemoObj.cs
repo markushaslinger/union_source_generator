@@ -13,6 +13,9 @@ namespace UnionDemo
 
     [Union<IList<int>, long, Error>]
     public readonly partial struct WithInterface;
+    
+    [Union<Success<int>, Failure>]
+    public readonly partial struct SuccessWithWellKnownType;
 }
 
 namespace MyNamespace

@@ -35,7 +35,10 @@ namespace UnionGen
     internal sealed record TypeParameter(string Name, string FullName, bool IsReferenceType, bool IsInterface)
     {
         private string? _titleCaseName;
+        private string? _wellKnownName;
+        
         public string TitleCaseName => _titleCaseName ??= Name.EnsureTitleCase();
+        public string WellKnownName => _wellKnownName ??= WellKnownTypes.AdjustIfWellKnown(TitleCaseName);
         public string CallOperator => IsReferenceType
             ? "?."
             : ".";

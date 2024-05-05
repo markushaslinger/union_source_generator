@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.Immutable;
+using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -227,9 +228,9 @@ public sealed class UnionSourceGen : IIncrementalGenerator
                 var typeArguments = namedTypeSymbol.TypeArguments;
                 name = typeArguments.Length switch
                        {
-                           1 => $"{name}Of{typeArguments[0].Name.EnsureTitleCase()}",
+                           1 => $"{name}Of{GetTypeParamName(typeArguments, 0)}",
                            2 =>
-                               $"{name}Of{typeArguments[0].Name.EnsureTitleCase()}And{typeArguments[1].Name.EnsureTitleCase()}",
+                               $"{name}Of{GetTypeParamName(typeArguments, 0)}And{GetTypeParamName(typeArguments, 1)}",
                            _ => $"Generic{name}"
                        };
             }
@@ -240,6 +241,15 @@ public sealed class UnionSourceGen : IIncrementalGenerator
         }
 
         return typeNames;
+
+        static string GetTypeParamName(ImmutableArray<ITypeSymbol> typeParameters, int index)
+        {
+            var name = typeParameters[index].Name;
+            var titleCaseName = name.EnsureTitleCase();
+            var adjustedName = WellKnownTypes.AdjustIfWellKnown(titleCaseName);
+
+            return adjustedName;
+        }
     }
 
     private static string SanitizeName(string? rawName, string fullName)

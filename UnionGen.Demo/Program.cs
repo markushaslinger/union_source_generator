@@ -14,12 +14,12 @@ demo2.Switch(forInt: _ => {},
              forDouble: _ => {},
              forLongArray: a => Console.WriteLine($"{a.GetType()} {a.Length}"),
              forListOfFoo: _ => {},
-             forDictionaryOfStringAndBoolean: _ => {}
+             forDictionaryOfStringAndBool: _ => {}
              );
 
 var simple = new SimpleObj(new Result<int>(12));
 var found = simple.IsNotFound;
-var result = simple.AsResultOfInt32();
+var result = simple.AsResultOfInt();
 Console.WriteLine(result);
 
 simple.Switch(r => Console.WriteLine($"Found: {r}"),
