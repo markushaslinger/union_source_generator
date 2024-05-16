@@ -6,16 +6,35 @@ using UnionTest;
 var demo = new DemoObj(4);
 Console.WriteLine(demo.IsInt);
 Console.WriteLine(demo.AsInt());
+await demo.SwitchAsync(async i =>
+                       {
+                           await Task.Delay(100);
+                           Console.WriteLine(i);
+                       },
+                       _ => ValueTask.CompletedTask,
+                       _ => ValueTask.CompletedTask,
+                       _ => ValueTask.CompletedTask,
+                       _ => ValueTask.CompletedTask);
+var matchRes = await demo.MatchAsync(async i =>
+                                     {
+                                         await Task.Delay(100);
+
+                                         return i * i;
+                                     },
+                                     _ => ValueTask.FromResult(-1),
+                                     _ => ValueTask.FromResult(-2),
+                                     _ => ValueTask.FromResult(-3),
+                                     _ => ValueTask.FromResult(-4));
+Console.WriteLine(matchRes);
 
 var demo2 = new DemoObj([1L, 2L, 3L]);
 Console.WriteLine(demo2.IsLongArray);
 Console.WriteLine(demo2.IsListOfFoo);
-demo2.Switch(forInt: _ => {},
-             forDouble: _ => {},
-             forLongArray: a => Console.WriteLine($"{a.GetType()} {a.Length}"),
-             forListOfFoo: _ => {},
-             forDictionaryOfStringAndBool: _ => {}
-             );
+demo2.Switch(_ => { },
+             _ => { },
+             a => Console.WriteLine($"{a.GetType()} {a.Length}"),
+             _ => { },
+             _ => { });
 
 var simple = new SimpleObj(new Result<int>(12));
 var found = simple.IsNotFound;
