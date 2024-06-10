@@ -35,7 +35,7 @@ This library is **opinionated** as it will try to assign '_readable_' names to t
 
 ```csharp
 SimpleObj simple = new SimpleObj(new Result<int>(12));
-bool found = simple.IsNotFound;
+bool notFound = simple.IsNotFound;
 Result<int> result = simple.AsResultOfInt();
 ```
 
